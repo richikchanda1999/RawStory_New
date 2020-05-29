@@ -114,7 +114,7 @@ class _HomeState extends State<Home> with Design {
                 );
         },
       ),
-
+      bottomNavigationBar: SizedBox(width: MediaQuery.of(context).size.width, height: 100, child: Container(),),
     );
   }
 }
