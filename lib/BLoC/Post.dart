@@ -11,6 +11,7 @@ class PostsBLoC {
   Stream<List<Post>> get getPosts => postController.stream;
   List<Post> posts;
   int limit, offset;
+  String sectionName;
 
   static Post currentPost;
 
@@ -23,9 +24,11 @@ class PostsBLoC {
     if (postController == null) postController = BehaviorSubject();
 
     if (posts == null) {
-      limit = 10;
+      limit = 30;
       offset = 0;
-      posts = await Worker.work(limit: limit, offset: offset);
+      sectionName = "big-stories";
+      posts = await Worker.work(limit: limit, offset: offset, sectionName: sectionName);
+      for(Post p in posts) print(p.sections);
       addPosts(posts);
     }
   }

@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:raw_story_new/BLoC/Screens.dart';
+import 'package:raw_story_new/BLoC/Sections.dart';
 import 'package:raw_story_new/UI/Post.dart';
 import 'UI/Home.dart';
 
 void main() {
-  runApp(MyApp());
+  bool isDebug = true;
+
+  SectionsBLoC().init();
+  SectionsBLoC().fetchSections();
+  runApp(MyApp(isDebug));
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  final bool isDebug;
+
+  MyApp(this.isDebug);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -17,7 +25,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyNavigator(),
+      home: isDebug ? Scaffold() : MyNavigator(),
     );
   }
 }

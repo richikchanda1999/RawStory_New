@@ -3,17 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:raw_story_new/BLoC/Post.dart';
 import 'package:raw_story_new/BLoC/Screens.dart';
+import 'package:raw_story_new/BLoC/Sections.dart';
 import 'package:raw_story_new/Models/Post.dart';
 import 'package:raw_story_new/Styles/Home.dart';
 
 import '../AdSupport.dart';
 import 'Login.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatelessWidget with HomeStyle{
   @override
   Widget build(BuildContext context) {
-    FirebaseAdMob.instance.initialize(appId: AdSupport().getAppId()).then((_){
-      myBanner..load()..show();
+    FirebaseAdMob.instance.initialize(appId: AdSupport().getAppId()).then((_) {
+      myBanner
+        ..load()
+        ..show();
     });
     return Scaffold(
       backgroundColor: Colors.black,
@@ -49,7 +52,64 @@ class Home extends StatelessWidget {
       body: Center(
         child: PostsList(),
       ),
-      bottomNavigationBar: SizedBox(height: 100,),
+      bottomNavigationBar: SizedBox(
+        height: bottomNavBarHeight + 60 + 10.h,
+        child: Column(
+          children: <Widget>[
+            SizedBox(height: 10.h,),
+            SizedBox(
+                height: bottomNavBarHeight,
+                child: StreamBuilder<String>(
+                    stream: SectionsBLoC().getSection,
+                    builder: (context, snapshot) {
+                      return Row(
+                        children: List.generate(
+                            5,
+                            (index) => MyNavBarItem(
+                                text: SectionsBLoC.sectionTexts[index],
+                                icon: SectionsBLoC.sectionIcons[index],
+                                isSelected: snapshot.hasData
+                                    ? snapshot.data == SectionsBLoC.sectionTexts[index]
+                                    : index == 0)),
+                      );
+                    })),
+            SizedBox(height: 60,)
+          ],
+        ),
+      ),
+      bottomSheet: SizedBox(
+        height: 60,
+      ),
+    );
+  }
+}
+
+class MyNavBarItem extends StatelessWidget {
+  IconData icon;
+  String text;
+  bool isSelected;
+
+  MyNavBarItem(
+      {@required this.text, @required this.icon, @required this.isSelected});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          SectionsBLoC().addSection(text);
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Icon(icon, color: isSelected ? Colors.red : Colors.white),
+            Text(
+              text,
+              style: TextStyle(color: isSelected ? Colors.red : Colors.white),
+            )
+          ],
+        ),
+      ),
     );
   }
 }
@@ -74,7 +134,7 @@ class PostsList extends StatelessWidget {
   }
 }
 
-class PostCard extends StatelessWidget with PostCardStyle{
+class PostCard extends StatelessWidget with PostCardStyle {
   Post post;
 
   PostCard(this.post);
@@ -98,7 +158,11 @@ class PostCard extends StatelessWidget with PostCardStyle{
                   image: NetworkImage(post.image), fit: BoxFit.fill)),
           child: Align(
             alignment: Alignment.bottomCenter,
-            child: Text(post.headline, textAlign: TextAlign.justify, style: postHeadlineStyle,),
+            child: Text(
+              post.headline,
+              textAlign: TextAlign.justify,
+              style: postHeadlineStyle,
+            ),
           ),
         ),
       ),
@@ -115,7 +179,8 @@ MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
   // ignore: deprecated_member_use
   designedForFamilies: false,
   // ignore: deprecated_member_use
-  gender: MobileAdGender.male, // or MobileAdGender.female, MobileAdGender.unknown
+  gender:
+      MobileAdGender.male, // or MobileAdGender.female, MobileAdGender.unknown
   testDevices: <String>[], // Android emulators are considered test devices
 );
 
@@ -124,7 +189,7 @@ BannerAd myBanner = BannerAd(
   // https://developers.google.com/admob/android/test-ads
   // https://developers.google.com/admob/ios/test-ads
   adUnitId: BannerAd.testAdUnitId,
-  size: AdSize.smartBanner,
+  size: AdSize.banner,
   targetingInfo: targetingInfo,
   listener: (MobileAdEvent event) {
     print("BannerAd event is $event");

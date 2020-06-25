@@ -3,15 +3,7 @@ class Post {
   String headline, description, image, sourceUrl;
   String insertedDate;
 
-  Post(
-      {this.id,
-      this.headline,
-      this.description,
-      this.image,
-      this.insertedDate,
-      this.insertedTS,
-      this.updatedTS,
-      this.sourceUrl,});
+  List<int> sections;
 
   Post.fromMap(Map<String, dynamic> map) {
     id = map['id'];
@@ -22,6 +14,10 @@ class Post {
     insertedTS = map['inserted_ts'];
     updatedTS = map['updated_ts'];
     sourceUrl = map['source_url'];
+
+    var sectionD = map['sections'];
+    if (sectionD is List<dynamic>)
+      sections = sectionD.map((e) => e as int).toList();
   }
 
   Post.fromList(List<dynamic> list) {
@@ -33,6 +29,7 @@ class Post {
     insertedTS = list[5];
     updatedTS = list[6];
     sourceUrl = list[7];
+    sections = list[8];
   }
 
   List<dynamic> toList() => [
@@ -43,6 +40,7 @@ class Post {
         insertedDate,
         insertedTS,
         updatedTS,
-        sourceUrl
+        sourceUrl,
+        sections
       ];
 }

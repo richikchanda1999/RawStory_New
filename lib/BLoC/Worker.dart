@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:isolate';
-
 import 'package:http/http.dart' as http;
 import 'package:isolate_handler/isolate_handler.dart';
 import 'dart:convert';
@@ -26,13 +24,16 @@ class Worker {
     _isolateHandler = IsolateHandler();
   }
 
-  static Future<List<Post>> work({int limit, int offset}) async {
+  static Future<List<Post>> work({int limit, int offset, String sectionName}) async {
     _isIsolateSpawned = Completer();
     _isIsolateComplete = Completer();
     spawn();
     await _isIsolateSpawned.future;
-    _isolateHandler.send([limit, offset], to: isolateName);
+    print("Isolate spawned!");
+    _isolateHandler.send([limit, offset, sectionName], to: isolateName);
+    print("Data sent: ${[limit, offset, sectionName]}");
     await _isIsolateComplete.future;
+    dispose();
     return posts;
   }
 
@@ -43,11 +44,14 @@ class Worker {
         onInitialized: onInitialised);
   }
 
-  static Future<List<Post>> getPosts({int limit, int offset}) async {
+  static Future<List<Post>> getPosts(
+      {int limit, int offset, String sectionName}) async {
     String url =
-        "https://$username:$password@rawstory.rebelmouse.com/api/1.3/posts/frontpage?limit=${limit ?? 10}&offset=${offset ?? 0}";
+        "https://$username:$password@rawstory.rebelmouse.com/api/1.3/posts/section?section_name=$sectionName&limit=$limit&offset=$offset";
+    print(url);
     var req = await http.get(url, headers: params);
-
+    print(req.statusCode);
+    print(req.body);
     List<Post> posts = List();
     if (req.statusCode == 200) {
       var list = json.decode(req.body);
@@ -59,8 +63,14 @@ class Worker {
   static void isolateEntry(Map<String, dynamic> context) {
     final messenger = HandledIsolate.initialize(context);
     messenger.listen((message) async {
+      print("RECEIVED message: $message");
+      messenger.send(message[2].toString());
       if (message is List<dynamic>) {
-        List<Post> posts = await getPosts(limit: message[0], offset: message[1]);
+//        print("RECEIVED limit: ${message[0]}");
+//        print("RECEIVED offset: ${message[1]}");
+//        print("RECEIVED section_name: ${message[2]}");
+        List<Post> posts = await getPosts(
+            limit: message[0], offset: message[1], sectionName: message[2]);
         messenger.send(posts.map((e) => e.toList()).toList());
       }
     });
@@ -70,6 +80,10 @@ class Worker {
     if (message is List<List<dynamic>>) {
       posts = message.map((e) => Post.fromList(e)).toList();
       _isIsolateComplete.complete(true);
+    }
+
+    if (message is String) {
+      print("RECEIVED section_name: $message");
     }
   }
 
