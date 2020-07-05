@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:raw_story_new/BLoC/Post.dart';
 import 'package:raw_story_new/BLoC/Screens.dart';
 import 'package:raw_story_new/BLoC/Sections.dart';
 import 'package:raw_story_new/UI/Post.dart';
 import 'UI/Home.dart';
 
 void main() {
-  bool isDebug = true;
+  WidgetsFlutterBinding.ensureInitialized();
+  bool isDebug = false;
 
   SectionsBLoC().init();
-  SectionsBLoC().fetchSections();
+  PostsBLoC().init();
+  PostsBLoC().fetchPosts(30, 0, SectionsBLoC.sectionURLS[0]);
   runApp(MyApp(isDebug));
 }
 
@@ -21,7 +24,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: isDebug,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

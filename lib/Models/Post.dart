@@ -43,4 +43,12 @@ class Post {
         sourceUrl,
         sections
       ];
+
+  @override
+  int get hashCode => id;
+
+  @override
+  bool operator ==(other) {
+    return id == other.id;
+  }
 }

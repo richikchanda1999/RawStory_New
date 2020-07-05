@@ -13,6 +13,7 @@ var params = {'Content-Type': 'application/json', 'X-RMAuth': key};
 class Worker {
   static final Worker _worker = Worker._internal();
   factory Worker() => _worker;
+  Worker._internal();
 
   static IsolateHandler _isolateHandler;
   static String isolateName = "get_posts";
@@ -20,11 +21,10 @@ class Worker {
   static Completer<bool> _isIsolateComplete;
   static List<Post> posts;
 
-  Worker._internal() {
-    _isolateHandler = IsolateHandler();
-  }
 
   static Future<List<Post>> work({int limit, int offset, String sectionName}) async {
+    if (_isolateHandler != null) _isolateHandler.kill(isolateName);
+    else _isolateHandler = IsolateHandler();
     _isIsolateSpawned = Completer();
     _isIsolateComplete = Completer();
     spawn();

@@ -5,32 +5,28 @@ import 'package:rxdart/rxdart.dart';
 class PostsBLoC {
   static final PostsBLoC _bloc = PostsBLoC._internal();
   factory PostsBLoC() => _bloc;
+  PostsBLoC._internal();
 
   BehaviorSubject<List<Post>> postController;
   Function(List<Post>) get addPosts => postController.sink.add;
   Stream<List<Post>> get getPosts => postController.stream;
-  List<Post> posts;
-  int limit, offset;
-  String sectionName;
 
   static Post currentPost;
 
-  PostsBLoC._internal() {
-    Worker();
-    init();
+  Future<void> init() async {
+    postController = BehaviorSubject();
   }
 
-  Future<void> init() async {
-    if (postController == null) postController = BehaviorSubject();
-
-    if (posts == null) {
-      limit = 30;
-      offset = 0;
-      sectionName = "big-stories";
-      posts = await Worker.work(limit: limit, offset: offset, sectionName: sectionName);
-      for(Post p in posts) print(p.sections);
-      addPosts(posts);
+  Future<void> fetchPosts(int limit, int offset, List<String> sections) async {
+    List<Post> posts = List();
+    for (String sectionName in sections) {
+      List<Post> temp = await Worker.work(
+          limit: limit, offset: offset, sectionName: sectionName);
+      print("Posts fetched for : $sections");
+      posts.addAll(temp);
     }
+    posts = posts.toSet().toList();
+    addPosts(posts);
   }
 
   void dispose() {

@@ -1,9 +1,6 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:raw_story_new/Models/Section.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:http/http.dart' as http;
 
 class SectionsBLoC {
   static final SectionsBLoC _bloc = SectionsBLoC._internal();
@@ -22,22 +19,6 @@ class SectionsBLoC {
     if (sectionsController != null) sectionsController.close();
   }
 
-  Future<void> fetchSections() async {
-    String url =
-        "https://$username:$password@rawstory.rebelmouse.com/api/1.3/sections";
-    var req = await http.get(url, headers: params);
-
-    print(req.statusCode);
-    if (req.statusCode == 200) {
-      List<dynamic> sectionsList = json.decode(req.body);
-      print("Total sections: ${sectionsList.length}");
-      for(var sectionMap in sectionsList) {
-        Section section = Section.fromMap(sectionMap);
-        print(section);
-      }
-    }
-  }
-
   static const List<String> sectionTexts = [
     "Latest",
     "Trending",
@@ -51,6 +32,13 @@ class SectionsBLoC {
     Icons.receipt,
     Icons.video_library,
     Icons.view_headline
+  ];
+  static const List<List<String>> sectionURLS = [
+    ["latest-headlines"],
+    ["covid-19", "elections", "2020-election"],
+    ["featured"],
+    ["all-video", "featured-video", "politics-video"],
+    ["big-stories", "world"]
   ];
 }
 

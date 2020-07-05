@@ -96,8 +96,11 @@ class MyNavBarItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: GestureDetector(
-        onTap: () {
+        onTap: () async {
+          PostsBLoC().addPosts(null);
           SectionsBLoC().addSection(text);
+          List<String> sections = SectionsBLoC.sectionURLS[SectionsBLoC.sectionTexts.indexOf(text)];
+          await PostsBLoC().fetchPosts(30, 0, sections);
         },
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -120,7 +123,7 @@ class PostsList extends StatelessWidget {
     return StreamBuilder<List<Post>>(
         stream: PostsBLoC().getPosts,
         builder: (context, snapshot) {
-          if (!snapshot.hasData) return CircularProgressIndicator();
+          if (!snapshot.hasData || snapshot.data == null) return CircularProgressIndicator();
           List<Post> posts = snapshot.data;
           return ListView.separated(
               padding: EdgeInsets.only(top: 20.h, bottom: 40.h),
@@ -178,10 +181,6 @@ MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
   childDirected: false,
   // ignore: deprecated_member_use
   designedForFamilies: false,
-  // ignore: deprecated_member_use
-  gender:
-      MobileAdGender.male, // or MobileAdGender.female, MobileAdGender.unknown
-  testDevices: <String>[], // Android emulators are considered test devices
 );
 
 BannerAd myBanner = BannerAd(
