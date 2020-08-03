@@ -29,9 +29,7 @@ class Worker {
     _isIsolateComplete = Completer();
     spawn();
     await _isIsolateSpawned.future;
-    print("Isolate spawned!");
     _isolateHandler.send([limit, offset, sectionName], to: isolateName);
-    print("Data sent: ${[limit, offset, sectionName]}");
     await _isIsolateComplete.future;
     dispose();
     return posts;
@@ -66,9 +64,6 @@ class Worker {
       print("RECEIVED message: $message");
       messenger.send(message[2].toString());
       if (message is List<dynamic>) {
-//        print("RECEIVED limit: ${message[0]}");
-//        print("RECEIVED offset: ${message[1]}");
-//        print("RECEIVED section_name: ${message[2]}");
         List<Post> posts = await getPosts(
             limit: message[0], offset: message[1], sectionName: message[2]);
         messenger.send(posts.map((e) => e.toList()).toList());
