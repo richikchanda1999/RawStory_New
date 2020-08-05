@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:raw_story_new/BLoC/Post.dart';
 import 'package:raw_story_new/BLoC/Screens.dart';
 import 'package:raw_story_new/BLoC/Sections.dart';
-import 'package:raw_story_new/UI/ContriPage.dart';
+import 'package:raw_story_new/SplashScreen.dart';
 import 'package:raw_story_new/UI/Post.dart';
 import 'package:raw_story_new/UI/Subscription.dart';
 import 'UI/Home.dart';
@@ -30,10 +30,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: isDebug ? Scaffold() : MyNavigator(),
+      home: SplashLogo( isDebug ? Scaffold() : MyNavigator()),
     );
   }
 }
+
 
 class MyNavigator extends StatelessWidget {
   @override

@@ -119,45 +119,52 @@ class PostPage extends StatelessWidget with PostPageStyle {
                 height: 150.h,
                 child: Padding(
                   padding: const EdgeInsets.all(4.0),
-                  child: Container(
-                    width: width,
-                    child: Column(
-                      children: <Widget>[
-                        Expanded(
-                          child: Align(
+                  child: Banner(
+                    textStyle: TextStyle(color: Colors.black,fontSize: 11,fontWeight: FontWeight.bold),
+                    color: Colors.grey,
+                    location: BannerLocation.topStart,
+                    message: "Save Over \$40%",
+                                      child: Container(
+                                        
+                      width: width,
+                      child: Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text("Annual",
+                                  style: TextStyle(
+                                      color: txtCol,
+                                      fontWeight: FontWeight.bold,
+                                      fontStyle: FontStyle.italic,
+                                      fontSize: 21)),
+                            ),
+                          ),
+                          Expanded(
+                              child: Padding(
+                            padding: EdgeInsets.only(left: 20, right: 20),
+                            child: Text(
+                              "Support Raw Story, Ad-Free, with"
+                              " access to all content and special features for full year",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: txtCol),
+                            ),
+                          )),
+                          Expanded(
+                              child: Align(
                             alignment: Alignment.center,
-                            child: Text("Annual",
+                            child: Text("\$95 for the year",
                                 style: TextStyle(
                                     color: txtCol,
                                     fontWeight: FontWeight.bold,
                                     fontStyle: FontStyle.italic,
                                     fontSize: 21)),
-                          ),
-                        ),
-                        Expanded(
-                            child: Padding(
-                          padding: EdgeInsets.only(left: 20, right: 20),
-                          child: Text(
-                            "Support Raw Story, Ad-Free, with"
-                            " access to all content and special features for full year",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: txtCol),
-                          ),
-                        )),
-                        Expanded(
-                            child: Align(
-                          alignment: Alignment.center,
-                          child: Text("\$95 for the year",
-                              style: TextStyle(
-                                  color: txtCol,
-                                  fontWeight: FontWeight.bold,
-                                  fontStyle: FontStyle.italic,
-                                  fontSize: 21)),
-                        ))
-                      ],
+                          ))
+                        ],
+                      ),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20), color: contCol),
                     ),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20), color: contCol),
                   ),
                 ),
               ),
