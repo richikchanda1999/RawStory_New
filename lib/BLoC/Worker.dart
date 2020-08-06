@@ -45,11 +45,12 @@ class Worker {
   static Future<List<Post>> getPosts(
       {int limit, int offset, String sectionName}) async {
     String url =
-        "https://$username:$password@rawstory.rebelmouse.com/api/1.3/posts/section?section_name=$sectionName&limit=$limit&offset=$offset";
-    print(url);
+        "https://$username:$password@rawstory.rebelmouse.com/api/1.3/posts?limit=$limit&offset=$offset";
+
+    params['from_sections'] = sectionName;
+
     var req = await http.get(url, headers: params);
-    print(req.statusCode);
-    print(req.body);
+
     List<Post> posts = List();
     if (req.statusCode == 200) {
       var list = json.decode(req.body);
@@ -61,7 +62,6 @@ class Worker {
   static void isolateEntry(Map<String, dynamic> context) {
     final messenger = HandledIsolate.initialize(context);
     messenger.listen((message) async {
-      print("RECEIVED message: $message");
       messenger.send(message[2].toString());
       if (message is List<dynamic>) {
         List<Post> posts = await getPosts(
@@ -75,10 +75,6 @@ class Worker {
     if (message is List<List<dynamic>>) {
       posts = message.map((e) => Post.fromList(e)).toList();
       _isIsolateComplete.complete(true);
-    }
-
-    if (message is String) {
-      print("RECEIVED section_name: $message");
     }
   }
 

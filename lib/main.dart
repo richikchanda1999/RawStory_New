@@ -3,16 +3,22 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:raw_story_new/BLoC/Post.dart';
 import 'package:raw_story_new/BLoC/Screens.dart';
 import 'package:raw_story_new/BLoC/Sections.dart';
+import 'package:raw_story_new/BLoC/Test.dart';
 import 'package:raw_story_new/UI/Post.dart';
 import 'UI/Home.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  bool isDebug = false;
+  bool isDebug = true;
 
-  SectionsBLoC().init();
-  PostsBLoC().init();
-  PostsBLoC().fetchPosts(30, 0, SectionsBLoC.sectionURLS[0]);
+  if (isDebug) {
+    Test test = Test();
+    test.test();
+  } else {
+    SectionsBLoC().init();
+    PostsBLoC().init();
+    PostsBLoC().fetchPosts(30, 0, SectionsBLoC.sectionURLS[0]);
+  }
   runApp(MyApp(isDebug));
 }
 

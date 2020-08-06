@@ -34,11 +34,11 @@ class SectionsBLoC {
     Icons.view_headline
   ];
   static const List<List<String>> sectionURLS = [
-    ["latest-headlines"],
-    ["covid-19", "elections", "2020-election"],
-    ["featured"],
-    ["all-video", "featured-video", "politics-video"],
-    ["big-stories", "world"]
+    ["latest"],
+    ["trending"],
+    ["exclusives"],
+    ["video"],
+    ["content"]
   ];
 }
 
