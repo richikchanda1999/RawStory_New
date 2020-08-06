@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:raw_story_new/BLoC/Home.dart';
 import 'package:raw_story_new/BLoC/Post.dart';
 import 'package:raw_story_new/BLoC/Screens.dart';
 import 'package:raw_story_new/BLoC/Sections.dart';
@@ -14,7 +15,8 @@ void main() {
 
   SectionsBLoC().init();
   PostsBLoC().init();
-  PostsBLoC().fetchPosts(30, 0, SectionsBLoC.sectionURLS[0]);
+  PostsBLoC().fetchPosts(20, 0, SectionsBLoC.sectionURLS[0]);
+  HomeBLoC().init();
   runApp(MyApp(isDebug));
 }
 

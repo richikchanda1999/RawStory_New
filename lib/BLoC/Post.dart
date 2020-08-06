@@ -22,10 +22,10 @@ class PostsBLoC {
     for (String sectionName in sections) {
       List<Post> temp = await Worker.work(
           limit: limit, offset: offset, sectionName: sectionName);
-      print("Posts fetched for : $sections");
       posts.addAll(temp);
     }
     posts = posts.toSet().toList();
+    posts.shuffle();
     addPosts(posts);
   }
 
