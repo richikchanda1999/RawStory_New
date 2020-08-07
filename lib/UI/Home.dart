@@ -26,7 +26,6 @@ class Home extends StatelessWidget with HomeStyle {
 
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
         actions: <Widget>[
@@ -89,34 +88,46 @@ class Home extends StatelessWidget with HomeStyle {
       ),
       bottomNavigationBar: SizedBox(
         height: bottomNavBarHeight + 60 + 10.h,
-        child: Column(
-          children: <Widget>[
-            SizedBox(
-              height: 10.h,
-            ),
-            SizedBox(
-                height: bottomNavBarHeight,
-                child: StreamBuilder<String>(
-                    stream: SectionsBLoC().getSection,
-                    builder: (context, snapshot) {
-                      return Row(
-                        children: List.generate(
-                            5,
-                            (index) => MyNavBarItem(
-                                  text: SectionsBLoC.sectionTexts[index],
-                                  icon: SectionsBLoC.sectionIcons[index],
-                                  isSelected: snapshot.hasData
-                                      ? snapshot.data ==
-                                          SectionsBLoC.sectionTexts[index]
-                                      : index == 0,
-                                  scaffoldKey: index == 4 ? _scaffoldKey : null,
-                                )),
-                      );
-                    })),
-            SizedBox(
-              height: 60,
-            )
-          ],
+        child: Container(
+          color: Colors.black,
+          child: Column(
+            children: <Widget>[
+              SizedBox(
+                height: 8.h,
+              ),
+              SizedBox(
+                  height: bottomNavBarHeight,
+                  child: StreamBuilder<String>(
+                      stream: SectionsBLoC().getSection,
+                      builder: (context, snapshot) {
+                        return Row(
+                          children: List.generate(
+                              5 * 2 - 1,
+                              (index) => index % 2 == 0
+                                  ? MyNavBarItem(
+                                      text:
+                                          SectionsBLoC.sectionTexts[index ~/ 2],
+                                      icon:
+                                          SectionsBLoC.sectionIcons[index ~/ 2],
+                                      isSelected: snapshot.hasData
+                                          ? snapshot.data ==
+                                              SectionsBLoC
+                                                  .sectionTexts[index ~/ 2]
+                                          : index ~/ 2 == 0,
+                                      scaffoldKey:
+                                          index ~/ 2 == 4 ? _scaffoldKey : null,
+                                    )
+                                  : VerticalDivider(
+                                      color: Colors.grey,
+                                      width: 10.w,
+                                    )),
+                        );
+                      })),
+              SizedBox(
+                height: 60,
+              )
+            ],
+          ),
         ),
       ),
       bottomSheet: SizedBox(
@@ -306,7 +317,7 @@ class MyDrawer extends StatelessWidget {
             GestureDetector(
               onTap: () {
                 Navigator.of(context).pop();
-                ScreenBLoC().toScreen(Screens.SUBS);
+                ScreenBLoC().toScreen(Screens.SUBSCRIPTIONS);
               },
               child: Container(
                 height: 60.h,
@@ -320,6 +331,47 @@ class MyDrawer extends StatelessWidget {
                         fontFamily: 'Roboto',
                         fontSize: 25.ssp),
                   ),
+                ),
+              ),
+            ),
+            Divider(),
+            SizedBox(
+              height: 100.h,
+              child: Center(
+                child: Row(
+                  children: <Widget>[
+                    IconButton(
+                        icon: Icon(
+                          Icons.info_outline,
+                          color: Color(0xff5a595e),
+                        ),
+                        onPressed: null),
+                    IconButton(
+                        icon: Icon(
+                          Icons.settings,
+                          color: Color(0xff5a595e),
+                        ),
+                        onPressed: null),
+                    IconButton(
+                        icon: Icon(
+                          Icons.bookmark_border,
+                          color: Color(0xff5a595e),
+                        ),
+                        onPressed: null),
+                    IconButton(
+                        icon: Icon(
+                          Icons.search,
+                          color: Color(0xff5a595e),
+                        ),
+                        onPressed: null),
+                    Spacer(),
+                    IconButton(
+                        icon: Icon(
+                          Icons.exit_to_app,
+                          color: Color(0xff5a595e),
+                        ),
+                        onPressed: null),
+                  ],
                 ),
               ),
             )

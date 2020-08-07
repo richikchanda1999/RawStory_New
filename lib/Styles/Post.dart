@@ -6,7 +6,7 @@ mixin PostPageStyle {
   TextStyle get headlineStyle => TextStyle(color: Colors.white, fontSize: 50.ssp);
   Map<String, Style> get descriptionStyle => {
     "html": Style(
-      color: Colors.white
+      color: Colors.black
     ),
   };
 }

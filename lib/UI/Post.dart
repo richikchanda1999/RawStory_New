@@ -13,7 +13,6 @@ class PostPage extends StatelessWidget with PostPageStyle {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: IconButton(
@@ -90,14 +89,16 @@ class PostPage extends StatelessWidget with PostPageStyle {
                           ),
                         ),
                         Expanded(
-                            child: Padding(
-                          padding: const EdgeInsets.only(left: 20, right: 20),
-                          child: Text(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 20, right: 20),
+                            child: Text(
                               "Support Raw Story, Ad-Free, with"
                               " access to all content and special features",
                               textAlign: TextAlign.center,
-                              style: TextStyle(color: txtCol)),
-                        )),
+                              style: TextStyle(color: txtCol),
+                            ),
+                          ),
+                        ),
                         Expanded(
                             child: Align(
                           alignment: Alignment.center,
@@ -111,7 +112,8 @@ class PostPage extends StatelessWidget with PostPageStyle {
                       ],
                     ),
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20), color: contCol),
+                        borderRadius: BorderRadius.circular(20),
+                        color: contCol),
                   ),
                 ),
               ),
@@ -120,12 +122,14 @@ class PostPage extends StatelessWidget with PostPageStyle {
                 child: Padding(
                   padding: const EdgeInsets.all(4.0),
                   child: Banner(
-                    textStyle: TextStyle(color: Colors.black,fontSize: 11,fontWeight: FontWeight.bold),
+                    textStyle: TextStyle(
+                        color: Colors.black,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold),
                     color: Colors.grey,
                     location: BannerLocation.topStart,
                     message: "Save Over \$40%",
-                                      child: Container(
-                                        
+                    child: Container(
                       width: width,
                       child: Column(
                         children: <Widget>[
@@ -163,7 +167,8 @@ class PostPage extends StatelessWidget with PostPageStyle {
                         ],
                       ),
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20), color: contCol),
+                          borderRadius: BorderRadius.circular(20),
+                          color: contCol),
                     ),
                   ),
                 ),
@@ -180,7 +185,8 @@ class PostPage extends StatelessWidget with PostPageStyle {
                           child: Align(
                             alignment: Alignment.center,
                             child: Padding(
-                              padding: const EdgeInsets.only(left: 20, right: 20),
+                              padding:
+                                  const EdgeInsets.only(left: 20, right: 20),
                               child: Text("Supporter",
                                   style: TextStyle(
                                       color: txtCol,
@@ -207,7 +213,8 @@ class PostPage extends StatelessWidget with PostPageStyle {
                       ],
                     ),
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20), color: contCol),
+                        borderRadius: BorderRadius.circular(20),
+                        color: contCol),
                   ),
                 ),
               )

@@ -7,6 +7,7 @@ import 'package:raw_story_new/BLoC/Sections.dart';
 import 'package:raw_story_new/SplashScreen.dart';
 import 'package:raw_story_new/UI/Post.dart';
 import 'package:raw_story_new/UI/Subscription.dart';
+import 'UI/About.dart';
 import 'UI/Home.dart';
 
 void main() {
@@ -32,11 +33,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: SplashLogo( isDebug ? Scaffold() : MyNavigator()),
+      home: SplashLogo(isDebug ? Scaffold() : MyNavigator()),
     );
   }
 }
-
 
 class MyNavigator extends StatelessWidget {
   @override
@@ -48,7 +48,11 @@ class MyNavigator extends StatelessWidget {
             stream: ScreenBLoC().getScreen,
             builder: (context, snapshot) {
               return AnimatedSwitcher(
-                child: getScreen(snapshot.data ?? Screens.SUBS),
+                child: WillPopScope(
+                    onWillPop: () async {
+                      return false;
+                    },
+                    child: getScreen(snapshot.data ?? Screens.SUBSCRIPTIONS)),
                 duration: Duration(milliseconds: 1500),
               );
             });
@@ -62,10 +66,11 @@ class MyNavigator extends StatelessWidget {
         return Home();
       case Screens.POST:
         return PostPage();
-      case Screens.SUBS:
+      case Screens.SUBSCRIPTIONS:
         return SubsPage();
-      default:
-        return Scaffold();
+      case Screens.ABOUT:
+        return About();
+        break;
     }
   }
 }
