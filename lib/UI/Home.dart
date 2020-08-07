@@ -2,6 +2,8 @@ import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:raw_story_new/BLoC/About.dart';
+import 'package:raw_story_new/BLoC/BookmarkedStories.dart';
 import 'package:raw_story_new/BLoC/Home.dart';
 import 'package:raw_story_new/BLoC/Post.dart';
 import 'package:raw_story_new/BLoC/Screens.dart';
@@ -32,12 +34,7 @@ class Home extends StatelessWidget with HomeStyle {
           FlatButton.icon(
               splashColor: Colors.white,
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) {
-                    return LoginPage();
-                  }),
-                );
+                ScreenBLoC().toScreen(Screens.LOGIN);
               },
               icon: Icon(
                 Icons.person,
@@ -45,7 +42,7 @@ class Home extends StatelessWidget with HomeStyle {
               ),
               label: Text(
                 'User Login',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.white, fontSize: 25.ssp),
               ))
         ],
         leading: StreamBuilder<bool>(
@@ -302,18 +299,18 @@ class MyDrawer extends StatelessWidget {
               ),
             ),
             textOption(0, context),
-            Divider(),
+            Divider(thickness: 5.ssp, height: 40.h,),
             textOption(1, context),
             textOption(2, context),
             textOption(3, context),
             textOption(4, context),
             textOption(5, context),
-            Divider(),
+            Divider(thickness: 5.ssp, height: 40.h,),
             textOption(6, context),
             textOption(7, context),
             textOption(8, context),
             textOption(9, context),
-            Divider(),
+            Divider(thickness: 5.ssp, height: 40.h,),
             GestureDetector(
               onTap: () {
                 Navigator.of(context).pop();
@@ -321,58 +318,66 @@ class MyDrawer extends StatelessWidget {
               },
               child: Container(
                 height: 60.h,
-                margin: EdgeInsets.only(left: 20.w, right: 20.w),
+                margin: EdgeInsets.only(left: 40.w, right: 40.w),
                 color: Color(0xffff2722),
                 child: Center(
                   child: Text(
                     'Subscribe to Raw Story',
                     style: TextStyle(
                         color: Colors.white,
-                        fontFamily: 'Roboto',
-                        fontSize: 25.ssp),
+                        fontSize: 40.ssp),
                   ),
                 ),
               ),
             ),
-            Divider(),
+            Divider(thickness: 5.ssp, height: 40.h,),
             SizedBox(
-              height: 100.h,
-              child: Center(
-                child: Row(
-                  children: <Widget>[
-                    IconButton(
-                        icon: Icon(
-                          Icons.info_outline,
-                          color: Color(0xff5a595e),
-                        ),
-                        onPressed: null),
-                    IconButton(
-                        icon: Icon(
-                          Icons.settings,
-                          color: Color(0xff5a595e),
-                        ),
-                        onPressed: null),
-                    IconButton(
-                        icon: Icon(
-                          Icons.bookmark_border,
-                          color: Color(0xff5a595e),
-                        ),
-                        onPressed: null),
-                    IconButton(
-                        icon: Icon(
-                          Icons.search,
-                          color: Color(0xff5a595e),
-                        ),
-                        onPressed: null),
-                    Spacer(),
-                    IconButton(
-                        icon: Icon(
-                          Icons.exit_to_app,
-                          color: Color(0xff5a595e),
-                        ),
-                        onPressed: null),
-                  ],
-                ),
+              height: 80.h,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  IconButton(
+                      icon: Icon(
+                        Icons.info_outline,
+                        color: Color(0xff5a595e),
+                      ),
+                      onPressed: () {
+                        AboutBLoC().init();
+                        ScreenBLoC().toScreen(Screens.ABOUT);
+                      }),
+                  IconButton(
+                      icon: Icon(
+                        Icons.settings,
+                        color: Color(0xff5a595e),
+                      ),
+                      onPressed: () {
+                        ScreenBLoC().toScreen(Screens.SETTINGS);
+                      }),
+                  IconButton(
+                      icon: Icon(
+                        Icons.bookmark_border,
+                        color: Color(0xff5a595e),
+                      ),
+                      onPressed: () {
+                        BookmarkedStoriesBLoC().init();
+                        ScreenBLoC().toScreen(Screens.BOOKMARKED_STORIES);
+                      }),
+                  IconButton(
+                      icon: Icon(
+                        Icons.search,
+                        color: Color(0xff5a595e),
+                      ),
+                      onPressed: null),
+                  Spacer(),
+                  IconButton(
+                      icon: Icon(
+                        Icons.exit_to_app,
+                        color: Color(0xff5a595e),
+                      ),
+                      onPressed: () {
+                        ScreenBLoC().toScreen(Screens.LOGIN);
+                      }),
+                ],
               ),
             )
           ],
@@ -385,17 +390,20 @@ class MyDrawer extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         if (index < sections.length) {
-          ScreenBLoC().toScreen(Screens.POST);
+          ScreenBLoC().toScreen(Screens.HOME);
           HomeBLoC().setTapped(false);
           PostsBLoC().addPosts(null);
           Navigator.pop(context);
-          SectionsBLoC().addSection(SectionsBLoC.sectionTexts[4]);
+          SectionsBLoC().addSection(SectionsBLoC.sectionTexts[index == 0 ? 0 : 4]);
           await PostsBLoC().fetchPosts(20, 0, sections[index]);
         }
       },
-      child: Text(
-        headers[index],
-        style: TextStyle(fontFamily: 'Roboto', fontSize: 25.ssp),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+        child: Text(
+          headers[index],
+          style: TextStyle(fontSize: 35.ssp, fontWeight: FontWeight.w500, letterSpacing: 0.1.ssp),
+        ),
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:raw_story_new/BLoC/Auth.dart';
+import 'package:raw_story_new/BLoC/Screens.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class LoginPage extends StatefulWidget {
@@ -12,17 +13,12 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
-    super.initState();
-    AuthBLoC()
-        .getAdmiralAuthURL()
-        .then((value) {
-          print(value);
-          callbackUrl = value;
-          setState(() {
-
-          });
+    AuthBLoC().getAdmiralAuthURL().then((value) {
+      print(value);
+      callbackUrl = value;
+      setState(() {});
     });
+    super.initState();
   }
 
   @override
@@ -33,6 +29,14 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: Colors.black,
         title: Text("Login"),
         centerTitle: true,
+        leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              ScreenBLoC().toScreen(Screens.HOME);
+            }),
       ),
       body: callbackUrl == null || callbackUrl == ""
           ? Center(

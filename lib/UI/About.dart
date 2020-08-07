@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:raw_story_new/BLoC/About.dart';
 import 'package:raw_story_new/BLoC/Screens.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:raw_story_new/UI/MyExapansionListTile.dart';
 
 class About extends StatelessWidget {
   @override
@@ -26,21 +27,28 @@ class About extends StatelessWidget {
       ),
       resizeToAvoidBottomPadding: true,
       body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: 20.ssp),
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
         children: List.generate(
-            AboutBLoC().headers.length,
-            (index) => Row(
+          AboutBLoC().headers.length * 2,
+          (index) => index % 2 == 0
+              ? MyExpansionTile(
+                  title: Text(
+                    AboutBLoC().headers[index ~/ 2],
+                    style: TextStyle(
+                        fontSize: 35.ssp, fontWeight: FontWeight.w500),
+                  ),
                   children: <Widget>[
-                    Icon(Icons.arrow_forward_ios),
-                    SizedBox(
-                      width: 20.w,
-                    ),
                     Text(
-                      AboutBLoC().headers[index],
-                      style: TextStyle(fontFamily: 'Roboto', fontSize: 25.ssp),
-                    )
+                      AboutBLoC().body[index ~/ 2],
+                      style: TextStyle(fontSize: 30.ssp),
+                    ),
                   ],
-                )).toList(),
+                )
+              : Divider(
+                  thickness: 5.ssp,
+                  height: 40.h,
+                ),
+        ).toList(),
       ),
     );
   }

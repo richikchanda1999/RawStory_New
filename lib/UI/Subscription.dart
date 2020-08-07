@@ -56,9 +56,10 @@ class SubsPage extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(left: 20, right: 20),
                 child: Text(
-                  "Progressive journalism matters to you, and we know that adsget in the way,so become a member / supporter"
+                  "Progressive journalism matters to you, and we know that ads get in the way,so become a member / supporter"
                   " of RawStory to see clearer picture.\n\n\nWe believe facts are sacred. Become part of a movement with us."
                   " Power progressive journalism.",
+                  textAlign: TextAlign.justify,
                   style: TextStyle(color: txtCol, fontSize: 15),
                 ),
               )),
@@ -66,7 +67,7 @@ class SubsPage extends StatelessWidget {
               flex: 1,
               child: Padding(
                 padding: const EdgeInsets.only(top: 10),
-                child: Text("Join today, and your firsrt month is only \$1",
+                child: Text("Join today, and your first month is only \$1",
                     style: TextStyle(
                         color: txtCol,
                         fontWeight: FontWeight.bold,

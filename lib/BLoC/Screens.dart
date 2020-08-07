@@ -1,6 +1,6 @@
 import 'package:rxdart/rxdart.dart';
 
-enum Screens { HOME, POST, SUBSCRIPTIONS, ABOUT }
+enum Screens { HOME, POST, SUBSCRIPTIONS, ABOUT, SETTINGS, BOOKMARKED_STORIES, LOGIN, CONTRI }
 
 class ScreenBLoC {
   static final ScreenBLoC _bloc = ScreenBLoC._internal();

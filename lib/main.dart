@@ -1,18 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:raw_story_new/BLoC/Home.dart';
 import 'package:raw_story_new/BLoC/Post.dart';
 import 'package:raw_story_new/BLoC/Screens.dart';
 import 'package:raw_story_new/BLoC/Sections.dart';
 import 'package:raw_story_new/SplashScreen.dart';
+import 'package:raw_story_new/UI/BookmarkedStories.dart';
+import 'package:raw_story_new/UI/ContriPage.dart';
+import 'package:raw_story_new/UI/Login.dart';
 import 'package:raw_story_new/UI/Post.dart';
+import 'package:raw_story_new/UI/Settings.dart';
 import 'package:raw_story_new/UI/Subscription.dart';
 import 'UI/About.dart';
 import 'UI/Home.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   bool isDebug = false;
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
+
+  await SystemChrome.setEnabledSystemUIOverlays([]);
 
   SectionsBLoC().init();
   PostsBLoC().init();
@@ -32,6 +43,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: isDebug,
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        fontFamily: 'Nirmait'
       ),
       home: SplashLogo(isDebug ? Scaffold() : MyNavigator()),
     );
@@ -70,7 +82,14 @@ class MyNavigator extends StatelessWidget {
         return SubsPage();
       case Screens.ABOUT:
         return About();
-        break;
+      case Screens.SETTINGS:
+        return Settings();
+      case Screens.BOOKMARKED_STORIES:
+        return BookmarkedStories();
+      case Screens.LOGIN:
+        return LoginPage();
+      case Screens.CONTRI:
+        return ContributionPage();
     }
   }
 }

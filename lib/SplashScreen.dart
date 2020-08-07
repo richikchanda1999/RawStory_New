@@ -16,7 +16,7 @@ class _SplashLogoState extends State<SplashLogo> {
       navigateAfterSeconds: widget.navigateToScreen,
       image: Image.asset("assets/Images/Untitled.png"),
       backgroundColor: Colors.black,
-    photoSize: 100,
+      photoSize: 100,
       loaderColor: Colors.red,
     );
   }
