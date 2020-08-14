@@ -35,7 +35,7 @@ class SectionsBLoC {
   ];
   static const List<List<String>> sectionURLS = [
     ["latest-headlines"],
-    ["covid-19", "2020-election"],
+    ["big-stories", "topstories"],
     ["featured"],
     ["all-video", "featured-video", "politics-video"],
   ];

@@ -1,6 +1,8 @@
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:raw_story_new/AdSupport.dart';
 import 'package:raw_story_new/BLoC/Home.dart';
 import 'package:raw_story_new/BLoC/Post.dart';
 import 'package:raw_story_new/BLoC/Screens.dart';
@@ -42,8 +44,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: isDebug,
       theme: ThemeData(
+        fontFamily: 'TimesNewRoman',
         primarySwatch: Colors.blue,
-        fontFamily: 'Nirmait'
       ),
       home: SplashLogo(isDebug ? Scaffold() : MyNavigator()),
     );
@@ -56,16 +58,19 @@ class MyNavigator extends StatelessWidget {
     ScreenUtil.init(context, width: 768, height: 1024, allowFontScaling: true);
     return Builder(
       builder: (BuildContext context) {
+         FirebaseAdMob.instance.initialize(appId: AdSupport().getAppId()).then((_) {
+    });
         return StreamBuilder<Screens>(
             stream: ScreenBLoC().getScreen,
             builder: (context, snapshot) {
-              return AnimatedSwitcher(
-                child: WillPopScope(
-                    onWillPop: () async {
-                      return false;
-                    },
-                    child: getScreen(snapshot.data ?? Screens.SUBSCRIPTIONS)),
-                duration: Duration(milliseconds: 1500),
+              return WillPopScope(
+                onWillPop: () async {
+                    return false;
+                  },
+                child: AnimatedSwitcher(
+                  duration: Duration(milliseconds: 600),
+                  child: getScreen(snapshot.data ?? Screens.SUBSCRIPTIONS),
+                ),
               );
             });
       },

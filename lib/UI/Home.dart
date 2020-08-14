@@ -1,5 +1,4 @@
 import 'package:firebase_admob/firebase_admob.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:raw_story_new/BLoC/About.dart';
@@ -13,19 +12,45 @@ import 'package:raw_story_new/Styles/Home.dart';
 import 'package:raw_story_new/UI/ContriPage.dart';
 
 import '../AdSupport.dart';
-import 'Login.dart';
 
-class Home extends StatelessWidget with HomeStyle {
+class Home extends StatefulWidget {
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> with HomeStyle {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
-  Widget build(BuildContext context) {
-    FirebaseAdMob.instance.initialize(appId: AdSupport().getAppId()).then((_) {
-      myBanner
-        ..load()
-        ..show();
-    });
+  void initState() {
+    super.initState();
+    AdSupport().reinitialize();
+        AdSupport().myBanner
+          ..load().then((loaded) {
+            if (loaded) {
+              AdSupport().myBanner..show(anchorOffset: bottomNavBarHeight + 10.h);
+            }
+          });
+  }
 
+  @override
+  void dispose() {
+    try{
+       AdSupport().myBanner?.dispose();
+       AdSupport().myBanner=null;
+    }catch(error)
+    {
+      print(error);
+    }
+
+     
+
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -84,7 +109,7 @@ class Home extends StatelessWidget with HomeStyle {
             }),
       ),
       bottomNavigationBar: SizedBox(
-        height: bottomNavBarHeight + 60 + 10.h,
+        height: bottomNavBarHeight + 10.h,
         child: Container(
           color: Colors.black,
           child: Column(
@@ -120,15 +145,9 @@ class Home extends StatelessWidget with HomeStyle {
                                     )),
                         );
                       })),
-              SizedBox(
-                height: 60,
-              )
             ],
           ),
         ),
-      ),
-      bottomSheet: SizedBox(
-        height: 60,
       ),
     );
   }
@@ -193,7 +212,10 @@ class PostsList extends StatelessWidget {
                 Post post = posts[__];
                 return PostCard(post);
               },
-              separatorBuilder: (_, __) => Divider(),
+              separatorBuilder: (_, __) => Divider(
+                    height: 14,
+                    thickness: 0,
+                  ),
               itemCount: posts.length);
         });
   }
@@ -213,20 +235,42 @@ class PostCard extends StatelessWidget with PostCardStyle {
       },
       child: SizedBox(
         width: 700.w,
-        height: 400.w,
+        height: 450.w,
         child: Container(
-          margin: EdgeInsets.only(left: 30.w, right: 30.w),
-          padding: EdgeInsets.all(20.ssp),
+          margin: EdgeInsets.only(left: 9.w, right: 9.w),
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20.ssp),
               image: DecorationImage(
                   image: NetworkImage(post.image), fit: BoxFit.fill)),
           child: Align(
             alignment: Alignment.bottomCenter,
-            child: Text(
-              post.headline,
-              textAlign: TextAlign.justify,
-              style: postHeadlineStyle,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            colors: [
+                          Colors.black,
+                          Colors.black,
+                          Colors.black,
+                          Colors.black,
+                          Colors.black,
+                          Colors.black54,
+                          Colors.transparent
+                        ],
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter)),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    post.headline,
+                    textAlign: TextAlign.justify,
+                    style: postHeadlineStyle,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -299,18 +343,27 @@ class MyDrawer extends StatelessWidget {
               ),
             ),
             textOption(0, context),
-            Divider(thickness: 5.ssp, height: 40.h,),
+            Divider(
+              thickness: 5.ssp,
+              height: 40.h,
+            ),
             textOption(1, context),
             textOption(2, context),
             textOption(3, context),
             textOption(4, context),
             textOption(5, context),
-            Divider(thickness: 5.ssp, height: 40.h,),
+            Divider(
+              thickness: 5.ssp,
+              height: 40.h,
+            ),
             textOption(6, context),
             textOption(7, context),
             textOption(8, context),
             textOption(9, context),
-            Divider(thickness: 5.ssp, height: 40.h,),
+            Divider(
+              thickness: 5.ssp,
+              height: 40.h,
+            ),
             GestureDetector(
               onTap: () {
                 Navigator.of(context).pop();
@@ -323,14 +376,15 @@ class MyDrawer extends StatelessWidget {
                 child: Center(
                   child: Text(
                     'Subscribe to Raw Story',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 40.ssp),
+                    style: TextStyle(color: Colors.white, fontSize: 40.ssp),
                   ),
                 ),
               ),
             ),
-            Divider(thickness: 5.ssp, height: 40.h,),
+            Divider(
+              thickness: 5.ssp,
+              height: 40.h,
+            ),
             SizedBox(
               height: 80.h,
               child: Row(
@@ -394,7 +448,8 @@ class MyDrawer extends StatelessWidget {
           HomeBLoC().setTapped(false);
           PostsBLoC().addPosts(null);
           Navigator.pop(context);
-          SectionsBLoC().addSection(SectionsBLoC.sectionTexts[index == 0 ? 0 : 4]);
+          SectionsBLoC()
+              .addSection(SectionsBLoC.sectionTexts[index == 0 ? 0 : 4]);
           await PostsBLoC().fetchPosts(20, 0, sections[index]);
         }
       },
@@ -402,7 +457,10 @@ class MyDrawer extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
         child: Text(
           headers[index],
-          style: TextStyle(fontSize: 35.ssp, fontWeight: FontWeight.w500, letterSpacing: 0.1.ssp),
+          style: TextStyle(
+              fontSize: 35.ssp,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0.1.ssp),
         ),
       ),
     );

@@ -3,7 +3,6 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:raw_story_new/BLoC/Post.dart';
 import 'package:raw_story_new/BLoC/Screens.dart';
 import 'package:raw_story_new/Styles/Post.dart';
-import '../Models/Post.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PostPage extends StatelessWidget with PostPageStyle {
@@ -32,12 +31,41 @@ class PostPage extends StatelessWidget with PostPageStyle {
       ),
       resizeToAvoidBottomPadding: true,
       body: Padding(
-        padding: EdgeInsets.only(left: 34.w, right: 34.w),
+        padding: EdgeInsets.only(left: 9.w, right: 9.w),
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
+              Text(
+                PostsBLoC.currentPost.headline,
+                style: headlineStyle,
+              ),
+              SizedBox(
+                height: 2.h,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                    child: Image.asset(
+                      "assets/Images/twitter_circle_color-512.webp",
+                      height: 50.h,
+                      width: 50.h,
+                    ),
+                  ),
+                  Container(
+                    child: Image.asset(
+                      "assets/Images/6e732beb65774ba42c65fadd8c6c623a.jpg",
+                      height: 50.h,
+                      width:50.h,
+                    ),
+                  )
+                ],
+              ),
+              SizedBox(
+                height: 20.h,
+              ),
               SizedBox(
                   height: 300.h,
                   child: Image.network(
@@ -45,15 +73,7 @@ class PostPage extends StatelessWidget with PostPageStyle {
                     fit: BoxFit.fill,
                   )),
               SizedBox(
-                height: 20.h,
-              ),
-              Text(
-                PostsBLoC.currentPost.headline,
-                style: headlineStyle,
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(
-                height: 20.h,
+                height: 10.h,
               ),
               Divider(
                 color: Colors.white,
@@ -222,9 +242,7 @@ class PostPage extends StatelessWidget with PostPageStyle {
           ),
         ),
       ),
-      bottomNavigationBar: SizedBox(
-        height: 100,
-      ),
+     
     );
   }
 }
