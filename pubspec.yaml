@@ -16,9 +16,13 @@ dependencies:
   cupertino_icons: ^0.1.2
   isolate_handler: ^0.3.1
   rxdart: ^0.24.1
-  flutter_html: ^1.0.0
+  flutter_html: ^1.0.2
   splashscreen: ^1.2.0
   flutter_launcher_icons: ^0.7.5
+  url_launcher: ^5.5.0
+  tweet_ui: ^2.2.0+3
+  
+
   
 
 dev_dependencies:

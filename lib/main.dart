@@ -58,8 +58,7 @@ class MyNavigator extends StatelessWidget {
     ScreenUtil.init(context, width: 768, height: 1024, allowFontScaling: true);
     return Builder(
       builder: (BuildContext context) {
-         FirebaseAdMob.instance.initialize(appId: AdSupport().getAppId()).then((_) {
-    });
+         FirebaseAdMob.instance.initialize(appId: AdSupport().getAppId());
         return StreamBuilder<Screens>(
             stream: ScreenBLoC().getScreen,
             builder: (context, snapshot) {

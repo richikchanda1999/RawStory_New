@@ -7,7 +7,7 @@ mixin PostPageStyle {
   Map<String, Style> get descriptionStyle => {
     "html": Style(
       color: Colors.black,
-      fontSize: FontSize(32.ssp)
+      fontSize: FontSize(32.ssp),
     ),
   };
 }

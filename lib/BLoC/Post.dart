@@ -24,8 +24,6 @@ class PostsBLoC {
           limit: limit, offset: offset, sectionName: sectionName);
       posts.addAll(temp);
     }
-    posts = posts.toSet().toList();
-    posts.shuffle();
     addPosts(posts);
   }
 

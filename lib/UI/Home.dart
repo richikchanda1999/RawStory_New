@@ -25,26 +25,22 @@ class _HomeState extends State<Home> with HomeStyle {
   void initState() {
     super.initState();
     AdSupport().reinitialize();
-        AdSupport().myBanner
-          ..load().then((loaded) {
-            if (loaded) {
-              AdSupport().myBanner..show(anchorOffset: bottomNavBarHeight + 10.h);
-            }
-          });
+    AdSupport().myBanner
+      ..load().then((loaded) {
+        if (loaded) {
+          AdSupport().myBanner..show(anchorOffset: bottomNavBarHeight + 10.h);
+        }
+      });
   }
 
   @override
   void dispose() {
-    try{
-       AdSupport().myBanner?.dispose();
-       AdSupport().myBanner=null;
-    }catch(error)
-    {
+    try {
+      AdSupport().myBanner?.dispose();
+      AdSupport().myBanner = null;
+    } catch (error) {
       print(error);
     }
-
-     
-
 
     super.dispose();
   }

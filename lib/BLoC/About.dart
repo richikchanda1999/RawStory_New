@@ -1,5 +1,3 @@
-import 'package:rxdart/rxdart.dart';
-
 class AboutBLoC {
   static final AboutBLoC _bloc = AboutBLoC._internal();
   factory AboutBLoC() => _bloc;
