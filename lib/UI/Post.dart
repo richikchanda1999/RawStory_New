@@ -9,13 +9,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tweet_webview/tweet_webview.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-void launchFB() async {
+void launchFB(String shareUrl) async {
   String appUrl, storeUrl;
   if (Platform.isIOS) {
     appUrl = "com.facebook.Facebook";
     storeUrl = "apps.apple.com/us/app/appname/id284882215";
   } else {
-    appUrl = "facebook://xy";
+    appUrl = "fb://faceweb/f?href=https://www.facebook.com/sharer.php?u=$shareUrl";
     storeUrl =
         "https://play.google.com/store/apps/details?id=com.facebook.katana";
   }
@@ -32,7 +32,7 @@ void launchTwitter(String shareUrl) async {
     storeUrl = "apps.apple.com/us/app/appname/id333903271";
   } else {
     appUrl =
-        "http://www.twitter.com/intent/tweet?text=Check this out!\n$shareUrl\n@RawStory ";
+        "http://www.twitter.com/intent/tweet?text=Check this out!\n$shareUrl\n\n@RawStory ";
     storeUrl =
         "https://play.google.com/store/apps/details?id=com.twitter.android";
   }
@@ -102,7 +102,7 @@ class PostPage extends StatelessWidget with PostPageStyle {
                   ),
                   GestureDetector(
                     onTap: () async {
-                      launchFB();
+                      launchFB(PostsBLoC.currentPost.sourceUrl);
                     },
                     child: Container(
                       child: Image.asset(
