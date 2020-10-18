@@ -47,7 +47,7 @@ class Worker {
   static Future<List<Post>> getPosts(
       {int limit, int offset, String sectionName}) async {
     String url =
-        "https://$username:$password@rawstory.rebelmouse.com/api/1.3/posts/section?section_name=$sectionName&limit=$limit&offset=$offset";
+        "https://$username:$password@new.rawstory.com/api/1.3/posts/section?section_name=$sectionName&limit=$limit&offset=$offset";
     print(url);
     var req = await http.get(url, headers: params);
     print(req.statusCode);
