@@ -1,0 +1,26 @@
+##1. Pull down to refresh section 
+**2.  User/profile/settings to be removed
+##3.  Click on top icon to go latest page
+4.  Newsletter and signup needs to be shown on web view by a new to be given link
+##5.  Fb and twitter share buttons needs to updated from wp engine to mew rebel mouse endpoints
+##6.  Author and date info missing. To be brought by rebelmouse data feild
+##7.  Remove shops, left menu buttons
+##8.  From rebel mouse notification endpoints, show push notification here.
+##9.  Podcast link will given, then we have to show them on web view.
+
+
+10. ad in feeds
+11. story styles (pg-3)
+##12. contents bar
+##13. improving tweets
+
+
+15% increase
+settings tweaks
+
+info change terms of use / privacy policy merge and about page wikipedia intro and link
+
+privacy policy and masthead
+
+
+"listId":450

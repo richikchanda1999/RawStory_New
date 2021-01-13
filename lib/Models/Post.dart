@@ -3,6 +3,8 @@ class Post {
   String headline, description, image, sourceUrl;
   String insertedDate;
 
+  String rawShareUrl;
+  String authorName = '';
   List<int> sections;
 
   Post.fromMap(Map<String, dynamic> map) {
@@ -18,6 +20,15 @@ class Post {
     var sectionD = map['sections'];
     if (sectionD is List<dynamic>)
       sections = sectionD.map((e) => e as int).toList();
+
+    for (var r in map['roar_authors']) {
+      if (authorName == '')
+        authorName = r['title'];
+      else
+        authorName = authorName + ', ' + r['title'];
+    }
+
+    rawShareUrl = map['raw_share_url'];
   }
 
   Post.fromList(List<dynamic> list) {
@@ -30,6 +41,8 @@ class Post {
     updatedTS = list[6];
     sourceUrl = list[7];
     sections = list[8];
+    authorName = list[9];
+    rawShareUrl = list[10];
   }
 
   List<dynamic> toList() => [
@@ -41,7 +54,9 @@ class Post {
         insertedTS,
         updatedTS,
         sourceUrl,
-        sections
+        sections,
+        authorName,
+        rawShareUrl
       ];
 
   @override

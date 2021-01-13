@@ -34,9 +34,9 @@ class SectionsBLoC {
     Icons.view_headline
   ];
   static const List<List<String>> sectionURLS = [
-    ["latest-headlines"],
+    ["hot-off-the-wires"],
     ["big-stories", "topstories"],
-    ["featured"],
+    ["raw-investigates"],
     ["all-video", "featured-video", "politics-video"],
   ];
 }

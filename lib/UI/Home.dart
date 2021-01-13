@@ -1,5 +1,7 @@
-import 'package:firebase_admob/firebase_admob.dart';
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:raw_story_new/BLoC/About.dart';
 import 'package:raw_story_new/BLoC/BookmarkedStories.dart';
@@ -10,7 +12,6 @@ import 'package:raw_story_new/BLoC/Sections.dart';
 import 'package:raw_story_new/Models/Post.dart';
 import 'package:raw_story_new/Styles/Home.dart';
 import 'package:raw_story_new/UI/ContriPage.dart';
-
 import '../AdSupport.dart';
 
 class Home extends StatefulWidget {
@@ -24,20 +25,14 @@ class _HomeState extends State<Home> with HomeStyle {
   @override
   void initState() {
     super.initState();
-    AdSupport().reinitialize();
-    AdSupport().myBanner
-      ..load().then((loaded) {
-        if (loaded) {
-          AdSupport().myBanner..show(anchorOffset: bottomNavBarHeight + 10.h);
-        }
-      });
+
+    AdSupport().initialize(bottomNavBarHeight + 10.h);
   }
 
   @override
   void dispose() {
     try {
-      AdSupport().myBanner?.dispose();
-      AdSupport().myBanner = null;
+      AdSupport().dispose();
     } catch (error) {
       print(error);
     }
@@ -52,19 +47,20 @@ class _HomeState extends State<Home> with HomeStyle {
       appBar: AppBar(
         backgroundColor: Colors.black,
         actions: <Widget>[
-          FlatButton.icon(
-              splashColor: Colors.white,
-              onPressed: () {
-                ScreenBLoC().toScreen(Screens.LOGIN);
-              },
-              icon: Icon(
-                Icons.person,
+          FlatButton(
+            splashColor: Colors.white,
+            onPressed: () {
+              ScreenBLoC().toScreen(Screens.LOGIN);
+            },
+            child: Transform.rotate(
+              alignment: Alignment.topRight,
+              angle: 270 * pi / 180,
+              child: Icon(
+                Icons.exit_to_app,
                 color: Colors.white,
               ),
-              label: Text(
-                'User Login',
-                style: TextStyle(color: Colors.white, fontSize: 25.ssp),
-              ))
+            ),
+          )
         ],
         leading: StreamBuilder<bool>(
             initialData: false,
@@ -79,31 +75,40 @@ class _HomeState extends State<Home> with HomeStyle {
                     HomeBLoC().setTapped(!snapshot.data);
                   });
             }),
-        title: Image.asset(
-          'assets/Images/raw-story-logo.jpg',
-          height: 130.h,
-          width: 360.w,
+        title: GestureDetector(
+          onTap: () async {
+            PostsBLoC().addPosts(null);
+            SectionsBLoC().addSection("Latest");
+            await PostsBLoC().fetchPosts(20, 0, ["hot-off-the-wires"],
+                currentSectionText: "Latest");
+          },
+          child: Image.asset(
+            'assets/Images/raw-story-logo.jpg',
+            height: 130.h,
+            width: 360.w,
+          ),
         ),
         centerTitle: true,
       ),
-      drawer: MyDrawer(_scaffoldKey),
-      body: Center(
-        child: StreamBuilder<bool>(
-            initialData: false,
-            stream: HomeBLoC().getTappedState,
-            builder: (context, snapshot) {
-              return AnimatedSwitcher(
-                transitionBuilder: (Widget child, Animation<double> animation) {
-                  return ScaleTransition(
-                    child: child,
-                    scale: animation,
-                  );
-                },
-                child: snapshot.data ? ContributionPage() : PostsList(),
-                duration: Duration(milliseconds: 400),
-              );
-            }),
+      drawer: MyDrawer(
+        _scaffoldKey,
+        adHeight: bottomNavBarHeight + 10.h,
       ),
+      body: StreamBuilder<bool>(
+          initialData: false,
+          stream: HomeBLoC().getTappedState,
+          builder: (context, snapshot) {
+            return AnimatedSwitcher(
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return ScaleTransition(
+                  child: child,
+                  scale: animation,
+                );
+              },
+              child: snapshot.data ? ContributionPage() : PostsList(),
+              duration: Duration(milliseconds: 400),
+            );
+          }),
       bottomNavigationBar: SizedBox(
         height: bottomNavBarHeight + 10.h,
         child: Container(
@@ -196,92 +201,220 @@ class MyNavBarItem extends StatelessWidget {
 class PostsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<Post>>(
-        stream: PostsBLoC().getPosts,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData || snapshot.data == null)
-            return CircularProgressIndicator();
-          List<Post> posts = snapshot.data;
-          return ListView.separated(
-              padding: EdgeInsets.only(top: 20.h, bottom: 40.h),
-              itemBuilder: (_, __) {
-                Post post = posts[__];
-                return PostCard(post);
-              },
-              separatorBuilder: (_, __) => Divider(
-                    height: 14,
-                    thickness: 0,
+    return RefreshIndicator(
+      onRefresh: () async {
+        List<String> sections = PostsBLoC().currentSection;
+        PostsBLoC().addPosts(null);
+        await PostsBLoC().fetchPosts(20, 0, sections);
+      },
+      child: StreamBuilder<List<Post>>(
+          stream: PostsBLoC().getPosts,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData || snapshot.data == null)
+              return Center(child: CircularProgressIndicator());
+            String text;
+            List<Post> posts = snapshot.data;
+            int indx =
+                SectionsBLoC.sectionURLS.indexOf(PostsBLoC().currentSection);
+            indx != -1
+                ? text = SectionsBLoC.sectionTexts[indx].toUpperCase()
+                : text = PostsBLoC().currentSectionText.toUpperCase();
+            return Container(
+              // color: Colors.grey[300],
+              child: Column(
+                children: [
+                  text.isNotEmpty
+                      ? Expanded(
+                          flex: 1,
+                          child: Container(
+                            padding: EdgeInsets.only(bottom: 2.h),
+                            child: Text(
+                              text,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontFamily: 'Oswald', fontSize: 40.ssp),
+                            ),
+                          ))
+                      : SizedBox(),
+                  Expanded(
+                    flex: 20,
+                    child: ListView.separated(
+                        padding: EdgeInsets.only(
+                            top: 5.h, bottom: 40.h, left: 6.h, right: 6.h),
+                        itemBuilder: (_, __) {
+                          Post post = posts[__];
+                          return PostCard(post, __);
+                        },
+                        separatorBuilder: (_, __) => __ + 1 == 5
+                            ? Container(
+                                margin: const EdgeInsets.all(10),
+                                height: 420.h,
+                                child: AdSupport().nativeAd)
+                            : Divider(
+                                height: 10,
+                                thickness: 0,
+                              ),
+                        itemCount: posts.length),
                   ),
-              itemCount: posts.length);
-        });
+                ],
+              ),
+            );
+          }),
+    );
   }
 }
 
 class PostCard extends StatelessWidget with PostCardStyle {
   Post post;
+  int index;
 
-  PostCard(this.post);
+  PostCard(this.post, this.index);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        PostsBLoC.currentPost = post;
-        ScreenBLoC().toScreen(Screens.POST);
-      },
-      child: SizedBox(
+        onTap: () {
+          PostsBLoC.currentPost = post;
+          ScreenBLoC().toScreen(Screens.POST);
+        },
+        child: PostCardLayouts(post).getLayout(index));
+  }
+}
+
+class PostCardLayouts with PostCardStyle {
+  Post post;
+
+  PostCardLayouts(this.post);
+
+  int getLayoutType(int index) {
+    double i = ((index) % 6 + 1) / 2;
+
+    if (i < 1.5) {
+      return 0;
+    } else if (i < 2.5) {
+      return 1;
+    } else {
+      return 2;
+    }
+  }
+
+  SizedBox getLayout(int index) {
+    int layout = getLayoutType(index);
+    List<SizedBox> layouts = [
+      SizedBox(
         width: 700.w,
-        height: 450.w,
+        height: 420.w,
         child: Container(
           margin: EdgeInsets.only(left: 9.w, right: 9.w),
           decoration: BoxDecoration(
               image: DecorationImage(
                   image: NetworkImage(post.image), fit: BoxFit.fill)),
-          child: Align(
+          child: Stack(
             alignment: Alignment.bottomCenter,
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                            colors: [
-                          Colors.black,
-                          Colors.black,
-                          Colors.black,
-                          Colors.black,
-                          Colors.black,
-                          Colors.black54,
-                          Colors.transparent
-                        ],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter)),
-                  ),
+            children: [
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(colors: [
+                    Colors.black,
+                    Colors.black,
+                    Colors.black87,
+                    Colors.black38,
+                    Colors.transparent,
+                    Colors.transparent,
+                    Colors.transparent
+                  ], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  post.headline,
+                  textAlign: TextAlign.left,
+                  style: postHeadlineStyle1,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      SizedBox(
+        width: 700.w,
+        height: 250.w,
+        child: Card(
+          // color: Colors.white,
+          margin: EdgeInsets.only(left: 9.w, right: 9.w),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                   child: Text(
                     post.headline,
-                    textAlign: TextAlign.justify,
-                    style: postHeadlineStyle,
+                    textAlign: TextAlign.left,
+                    style: postHeadlineStyle2,
                   ),
                 ),
-              ],
+              ),
+              Expanded(
+                  child: Image.network(
+                post.image,
+                fit: BoxFit.fill,
+              ))
+            ],
+          ),
+        ),
+      ),
+      SizedBox(
+        width: 700.w,
+        height: 250.w,
+        child: Card(
+          margin: EdgeInsets.only(left: 9.w, right: 9.w),
+          child: Container(
+            alignment: Alignment.center,
+            margin: const EdgeInsets.only(left: 8.0, right: 8.0),
+            child: Text(
+              post.headline,
+              textAlign: TextAlign.left,
+              style: postHeadlineStyle2,
             ),
           ),
         ),
       ),
-    );
+    ];
+    return layouts[layout];
   }
 }
 
-class MyDrawer extends StatelessWidget {
+class MyDrawer extends StatefulWidget {
   GlobalKey<ScaffoldState> scaffoldKey;
+  double adHeight;
 
-  MyDrawer(this.scaffoldKey);
+  MyDrawer(this.scaffoldKey, {this.adHeight});
+
+  @override
+  _MyDrawerState createState() => _MyDrawerState();
+}
+
+class _MyDrawerState extends State<MyDrawer> {
+  @override
+  void initState() {
+    super.initState();
+
+    AdSupport().dispose();
+  }
+
+  @override
+  void dispose() {
+    AdSupport().initialize(widget.adHeight);
+
+    super.dispose();
+  }
 
   List<String> headers = [
-    "Latest News",
+    "Front Page",
+    "Videos",
     "Commentary",
     "DC Report",
     "US News",
@@ -290,11 +423,11 @@ class MyDrawer extends StatelessWidget {
     "Community Polls",
     "We've Got Issues Podcast",
     "Newsletter",
-    "Shop"
   ];
 
   List<List<String>> sections = [
-    ['latest-headlines'],
+    ['hot-off-the-wires'],
+    ["all-video", "featured-video", "politics-video"],
     ['commentary'],
     ['dc-report'],
     ['us-news'],
@@ -306,7 +439,7 @@ class MyDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       child: Container(
-        color: Color(0xffe6e5ea),
+        // color: Color(0xffe6e5ea),
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -339,26 +472,35 @@ class MyDrawer extends StatelessWidget {
               ),
             ),
             textOption(0, context),
-            Divider(
-              thickness: 5.ssp,
-              height: 40.h,
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+              child: Divider(
+                thickness: 2.ssp,
+                height: 40.h,
+                color: Colors.black45,
+              ),
             ),
             textOption(1, context),
             textOption(2, context),
             textOption(3, context),
             textOption(4, context),
             textOption(5, context),
-            Divider(
-              thickness: 5.ssp,
-              height: 40.h,
-            ),
             textOption(6, context),
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+              child: Divider(
+                thickness: 2.ssp,
+                height: 40.h,
+                color: Colors.black45,
+              ),
+            ),
             textOption(7, context),
             textOption(8, context),
             textOption(9, context),
             Divider(
-              thickness: 5.ssp,
+              thickness: 2.ssp,
               height: 40.h,
+              color: Colors.black45,
             ),
             GestureDetector(
               onTap: () {
@@ -368,66 +510,72 @@ class MyDrawer extends StatelessWidget {
               child: Container(
                 height: 60.h,
                 margin: EdgeInsets.only(left: 40.w, right: 40.w),
-                color: Color(0xffff2722),
+                color: Color(0xffdf1f27),
                 child: Center(
                   child: Text(
-                    'Subscribe to Raw Story',
-                    style: TextStyle(color: Colors.white, fontSize: 40.ssp),
+                    'Subscribe to Raw Story'.toUpperCase(),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 28.ssp,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.3),
                   ),
                 ),
               ),
             ),
-            Divider(
-              thickness: 5.ssp,
-              height: 40.h,
-            ),
-            SizedBox(
-              height: 80.h,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  IconButton(
-                      icon: Icon(
-                        Icons.info_outline,
-                        color: Color(0xff5a595e),
-                      ),
-                      onPressed: () {
-                        AboutBLoC().init();
-                        ScreenBLoC().toScreen(Screens.ABOUT);
-                      }),
-                  IconButton(
-                      icon: Icon(
-                        Icons.settings,
-                        color: Color(0xff5a595e),
-                      ),
-                      onPressed: () {
-                        ScreenBLoC().toScreen(Screens.SETTINGS);
-                      }),
-                  IconButton(
-                      icon: Icon(
-                        Icons.bookmark_border,
-                        color: Color(0xff5a595e),
-                      ),
-                      onPressed: () {
-                        BookmarkedStoriesBLoC().init();
-                        ScreenBLoC().toScreen(Screens.BOOKMARKED_STORIES);
-                      }),
-                  IconButton(
-                      icon: Icon(
-                        Icons.search,
-                        color: Color(0xff5a595e),
-                      ),
-                      onPressed: null),
-                  Spacer(),
-                  IconButton(
-                      icon: Icon(
-                        Icons.exit_to_app,
-                        color: Color(0xff5a595e),
-                      ),
-                      onPressed: () {
-                        ScreenBLoC().toScreen(Screens.LOGIN);
-                      }),
-                ],
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: SizedBox(
+                height: 80.h,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    IconButton(
+                        icon: Icon(
+                          Icons.info_outline,
+                          size: 60.ssp,
+                        ),
+                        onPressed: () {
+                          AboutBLoC().init();
+                          ScreenBLoC().toScreen(Screens.ABOUT);
+                        }),
+                    SizedBox(width: 19.ssp),
+                    IconButton(
+                        icon: Icon(
+                          Icons.settings,
+                          size: 60.ssp,
+                        ),
+                        onPressed: () {
+                          ScreenBLoC().toScreen(Screens.SETTINGS);
+                        }),
+                    SizedBox(width: 19.ssp),
+                    IconButton(
+                        icon: Icon(
+                          Icons.bookmark_border,
+                          size: 60.ssp,
+                        ),
+                        onPressed: () {
+                          BookmarkedStoriesBLoC().init();
+                          ScreenBLoC().toScreen(Screens.BOOKMARKED_STORIES);
+                        }),
+                    SizedBox(width: 19.ssp),
+                    IconButton(
+                        icon: Icon(
+                          Icons.search,
+                          size: 60.ssp,
+                        ),
+                        onPressed: () {}),
+                    Spacer(),
+                    IconButton(
+                        icon: Icon(
+                          Icons.exit_to_app,
+                          size: 60.ssp,
+                        ),
+                        onPressed: () {
+                          SystemNavigator.pop();
+                        }),
+                  ],
+                ),
               ),
             )
           ],
@@ -446,7 +594,14 @@ class MyDrawer extends StatelessWidget {
           Navigator.pop(context);
           SectionsBLoC()
               .addSection(SectionsBLoC.sectionTexts[index == 0 ? 0 : 4]);
-          await PostsBLoC().fetchPosts(20, 0, sections[index]);
+          await PostsBLoC().fetchPosts(20, 0, sections[index],
+              currentSectionText: headers[index]);
+        }
+        if (index == 8) {
+          ScreenBLoC().toScreen(Screens.PODCASTS);
+        }
+        if (index == 9) {
+          ScreenBLoC().toScreen(Screens.NEWSLETTER);
         }
       },
       child: Padding(
@@ -454,9 +609,10 @@ class MyDrawer extends StatelessWidget {
         child: Text(
           headers[index],
           style: TextStyle(
-              fontSize: 35.ssp,
-              fontWeight: FontWeight.w500,
-              letterSpacing: 0.1.ssp),
+            fontFamily: 'Oswald',
+            fontSize: 36.ssp,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
     );

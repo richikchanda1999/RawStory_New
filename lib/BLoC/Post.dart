@@ -12,13 +12,17 @@ class PostsBLoC {
   Stream<List<Post>> get getPosts => postController.stream;
 
   static Post currentPost;
+  List<String> currentSection;
+  String currentSectionText;
 
   Future<void> init() async {
     postController = BehaviorSubject();
   }
 
-  Future<void> fetchPosts(int limit, int offset, List<String> sections) async {
+  Future<void> fetchPosts(int limit, int offset, List<String> sections,{String currentSectionText}) async {
     List<Post> posts = List();
+    currentSection=sections;
+    this.currentSectionText=currentSectionText;
     for (String sectionName in sections) {
       List<Post> temp = await Worker.work(
           limit: limit, offset: offset, sectionName: sectionName);

@@ -21,10 +21,12 @@ class Worker {
   static Completer<bool> _isIsolateComplete;
   static List<Post> posts;
 
-
-  static Future<List<Post>> work({int limit, int offset, String sectionName}) async {
-    if (_isolateHandler != null) _isolateHandler.kill(isolateName);
-    else _isolateHandler = IsolateHandler();
+  static Future<List<Post>> work(
+      {int limit, int offset, String sectionName}) async {
+    if (_isolateHandler != null)
+      _isolateHandler.kill(isolateName);
+    else
+      _isolateHandler = IsolateHandler();
     _isIsolateSpawned = Completer();
     _isIsolateComplete = Completer();
     spawn();
@@ -47,11 +49,10 @@ class Worker {
   static Future<List<Post>> getPosts(
       {int limit, int offset, String sectionName}) async {
     String url =
-        "https://$username:$password@new.rawstory.com/api/1.3/posts/section?section_name=$sectionName&limit=$limit&offset=$offset";
+        "https://$username:$password@rawstory.com/api/1.3/posts/section?section_name=$sectionName&limit=$limit&offset=$offset";
     print(url);
     var req = await http.get(url, headers: params);
     print(req.statusCode);
-    print(req.body);
     List<Post> posts = List();
     if (req.statusCode == 200) {
       var list = json.decode(req.body);

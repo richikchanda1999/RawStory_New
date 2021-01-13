@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:raw_story_new/BLoC/Screens.dart';
 
 class SubsPage extends StatelessWidget {
+
+
   var txtCol = Colors.white;
   var contCol = Colors.red;
   @override

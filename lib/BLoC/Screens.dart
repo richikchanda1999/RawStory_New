@@ -1,6 +1,18 @@
 import 'package:rxdart/rxdart.dart';
 
-enum Screens { HOME, POST, SUBSCRIPTIONS, ABOUT, SETTINGS, BOOKMARKED_STORIES, LOGIN, CONTRI }
+enum Screens {
+  HOME,
+  POST,
+  SUBSCRIPTIONS,
+  ABOUT,
+  SETTINGS,
+  BOOKMARKED_STORIES,
+  LOGIN,
+  CONTRI,
+  PODCASTS,
+  POSTFROMNOTIFICATION,
+  NEWSLETTER
+}
 
 class ScreenBLoC {
   static final ScreenBLoC _bloc = ScreenBLoC._internal();
@@ -17,7 +29,7 @@ class ScreenBLoC {
   void init() {
     if (screenController == null) {
       screenController = BehaviorSubject();
-      toScreen(Screens.SUBSCRIPTIONS);
+      
     }
   }
 

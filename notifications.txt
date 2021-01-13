@@ -1,0 +1,47 @@
+Hi Jamel!
+
+
+While I'm aware that Push Notifications is a section, I wasn't sure what you all had done with Pushnami that we could potentially use and leverage for the app. Can someone from the team explain how that works for Adeeb, so we don't have to reinvent the wheel?
+
+Sure we can explain :)
+
+We have 2 sections:
+https://www.alternet.org/send/
+https://www.alternet.org/send-for-a-second-time/
+
+Whenever the writer selects one of these sections on the Entry Editor, the Pushnami team knows we want to send a notification to users.
+
+So, you can easily use the same logic and, whenever you want to send notifications just make sure you add the post in the sections above.
+
+The endpoint to submit a post to a section: https://apis.rebelmouse.com/api/reference/posts.html
+
+
+For the newsletter sign ups, we'd like to take advantage of the work that you have done with PostUp, 
+by sending additional email addresses to you to pass to PostUp, similar to how you do for the polls.
+
+We don't have endpoints for the newsletter. As far as I understand you, you want to use the api to 
+add new emails to your mail list. Is that all?
+
+There is no such endpoint, but we can scope it out. I'll create the ticket and keep you posted.
+
+thank you,
+
+
+
+
+
+Hey Jamel,
+
+Reviewing the last conversation with Amanda re: this.
+
+"the ask would be that if "Push notification" is selected, Adeeb could also receive a message via the 
+API to the app".
+
+If that is the case then IMO you only need to know the most recent stories in 
+the 'Push Notification' category, which can be done via RSS feeds ( this is how Pushnami discover new 
+stories that they need to send out anyways ) and not overcomplicate with API integration.
+
+Here is the feed that Pushnami reads:  https://www.alternet.org/feeds/send.rss?rs=182
+
+- Ben
+

@@ -3,6 +3,7 @@ import 'package:raw_story_new/BLoC/About.dart';
 import 'package:raw_story_new/BLoC/Screens.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:raw_story_new/UI/MyExapansionListTile.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class About extends StatelessWidget {
   @override
@@ -38,9 +39,23 @@ class About extends StatelessWidget {
                         fontSize: 35.ssp, fontWeight: FontWeight.w500),
                   ),
                   children: <Widget>[
-                    Text(
+                    (index~/2)!=3?Text(
                       AboutBLoC().body[index ~/ 2],
                       style: TextStyle(fontSize: 30.ssp),
+                    ):GestureDetector(child: Text(
+                      AboutBLoC().body[index ~/ 2],
+                      style: TextStyle(fontSize: 30.ssp),
+                      
+                    ),
+                    onTap: ()async{
+                        if(await canLaunch(AboutBLoC().body[index ~/ 2]))
+                        {
+                          await launch(AboutBLoC().body[index ~/ 2]);
+                        }
+                        else{
+                          print("error");
+                        }
+                      },
                     ),
                   ],
                 )

@@ -30,7 +30,7 @@ class AuthBLoC {
   }
 
   Future<String> getAdmiralAuthURL() async {
-    if(_callbackURL != null) return callbackURL;
+    if (_callbackURL != null) return callbackURL;
 
     Map<String, dynamic> args = Map();
 
@@ -52,6 +52,25 @@ class AuthBLoC {
 
       return _callbackURL;
     }
+  }
+
+  Future<String> getAttributes() async {
+    Map<String, dynamic> args = {
+      "jsonrpc": "2.0",
+      "method": "GetAttributes",
+      "params": {
+        "sessionID": _sessionID,
+        "apiKey": _apiKey,
+        "apiKeySecret": _apiSecret
+      }
+    };
+
+    http.Response response = await http.post(_endpointURI,
+        headers: {"Content-Type": "application/json"}, body: jsonEncode(args));
+
+        print("getAttributes");
+        print(response.statusCode);
+        print(response.body);
   }
 }
 

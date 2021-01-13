@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:raw_story_new/BLoC/Screens.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:raw_story_new/Styles/Settings.dart';
+import 'package:raw_story_new/Settings/ThemesProvider.dart';
 
 class Settings extends StatelessWidget {
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -181,7 +184,7 @@ class Notifications extends StatelessWidget with SettingsStyle {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            MySwitch('Enable Notifications', true),
+            MySwitch('Enable Notifications', true , false),
             Text('What would you like to be notified about?'),
             CheckBoxTile('Breaking News'),
             CheckBoxTile('News Alerts'),
@@ -233,6 +236,8 @@ class _CheckBoxTileState extends State<CheckBoxTile> with SettingsStyle {
 }
 
 class ApplicationSettings extends StatelessWidget with SettingsStyle {
+
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -247,7 +252,7 @@ class ApplicationSettings extends StatelessWidget with SettingsStyle {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            MySwitch('Enable Dark Mode', false),
+            MySwitch('Enable Dark Mode', false,true),
             Text('Text Size'),
             MySlider()
           ],
@@ -329,7 +334,8 @@ class Newsletters extends StatelessWidget with SettingsStyle {
 class MySwitch extends StatefulWidget {
   final String text;
   bool value;
-  MySwitch(this.text, this.value);
+  final bool isAppSettings;
+  MySwitch(this.text, this.value,this.isAppSettings);
 
   @override
   _MySwitchState createState() => _MySwitchState();
@@ -338,6 +344,7 @@ class MySwitch extends StatefulWidget {
 class _MySwitchState extends State<MySwitch> with SettingsStyle{
   @override
   Widget build(BuildContext context) {
+    final themeProvider=Provider.of<ThemeProvider>(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
@@ -346,11 +353,31 @@ class _MySwitchState extends State<MySwitch> with SettingsStyle{
           style: subheadingStyle,
         ),
         Spacer(),
-        Switch(
+        widget.isAppSettings?
+        FutureBuilder<bool>(
+          future: themeProvider.getCurrentTheme,
+          builder: (context, snapshot) {
+            return Switch(
+              value: snapshot.hasData?snapshot.data:false,
+              onChanged: (v) {
+                
+                  themeProvider.setTheme(v);
+                
+                // setState(() {
+                //   widget.value =v;
+                // });
+              },
+              activeColor: Colors.blueAccent,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            );
+          }
+        ):Switch(
           value: widget.value,
           onChanged: (v) {
+          
+            
             setState(() {
-              widget.value = v;
+              widget.value =v;
             });
           },
           activeColor: Colors.blueAccent,

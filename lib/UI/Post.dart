@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -6,8 +7,10 @@ import 'package:raw_story_new/BLoC/Post.dart';
 import 'package:raw_story_new/BLoC/Screens.dart';
 import 'package:raw_story_new/Styles/Post.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:tweet_webview/tweet_webview.dart';
+import 'package:tweet_ui/embedded_tweet_view.dart';
+import 'package:tweet_ui/models/api/tweet.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
 
 void launchFB(String shareUrl) async {
   String appUrl, storeUrl;
@@ -15,7 +18,8 @@ void launchFB(String shareUrl) async {
     appUrl = "com.facebook.Facebook";
     storeUrl = "apps.apple.com/us/app/appname/id284882215";
   } else {
-    appUrl = "fb://faceweb/f?href=https://www.facebook.com/sharer.php?u=$shareUrl";
+    appUrl =
+        "fb://faceweb/f?href=https://www.facebook.com/sharer.php?u=$shareUrl";
     storeUrl =
         "https://play.google.com/store/apps/details?id=com.facebook.katana";
   }
@@ -31,8 +35,7 @@ void launchTwitter(String shareUrl) async {
     appUrl = "com.atebits.Tweetie2";
     storeUrl = "apps.apple.com/us/app/appname/id333903271";
   } else {
-    appUrl =
-        "http://www.twitter.com/intent/tweet?text=Check this out!\n$shareUrl\n\n@RawStory ";
+    appUrl = "http://www.twitter.com/intent/tweet?text=$shareUrl   @RawStory ";
     storeUrl =
         "https://play.google.com/store/apps/details?id=com.twitter.android";
   }
@@ -44,20 +47,51 @@ void launchTwitter(String shareUrl) async {
 
 class PostPage extends StatelessWidget with PostPageStyle {
   bool chk = false;
-  var txtCol = Colors.white;
-  var contCol = Colors.red;
-  String desc = PostsBLoC.currentPost.description;
 
+  var txtCol = Colors.white;
+
+  var contCol = Colors.red;
+
+  Future<Map<String, dynamic>> getTweetDataFromId(String id) async {
+    String endpoint = "https://api.twitter.com/1.1/statuses/show.json?id=$id";
+    String bearerToken =
+        "AAAAAAAAAAAAAAAAAAAAAHvkKQEAAAAArIonxGO9BNPMbq%2BlOcVR3RGBnRw%3Dsla7Lb5hv0TQekJ3PHHSB9yXcTYrudeVmLXdfsaTYaMMwnWAdQ";
+    Map<String, String> headers = {"Authorization": "Bearer $bearerToken"};
+
+    var response = await http.get(endpoint, headers: headers);
+
+    Map<String, dynamic> result = jsonDecode(response.body);
+    return result;
+  }
+
+  String desc = PostsBLoC.currentPost.description;
+  List<String> months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "July",
+    "Aug",
+    "Sept",
+    "Oct",
+    "Nov",
+    "Dec"
+  ];
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
+    var tS = PostsBLoC.currentPost.updatedTS;
+    var dt = DateTime.fromMillisecondsSinceEpoch(tS * 1000);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: IconButton(
             icon: Icon(
-              Icons.arrow_back,
+              Icons.arrow_back_ios,
               color: Colors.white,
             ),
             onPressed: () {
@@ -73,24 +107,45 @@ class PostPage extends StatelessWidget with PostPageStyle {
       resizeToAvoidBottomPadding: true,
       body: Padding(
         padding: EdgeInsets.only(left: 9.w, right: 9.w),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                PostsBLoC.currentPost.headline,
-                style: headlineStyle,
-              ),
-              SizedBox(
-                height: 2.h,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  GestureDetector(
+        child: ListView(
+          // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          // crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              PostsBLoC.currentPost.headline,
+              style: headlineStyle,
+            ),
+            SizedBox(
+              height: 8.h,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  flex: 10,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Published at ${dt.hour}:${dt.minute} on ${months[dt.month - 1]} ${dt.day}, ${dt.year}",
+                        style: TextStyle(color: Colors.black45),
+                      ),
+                      RichText(
+                          text: TextSpan(children: [
+                        TextSpan(
+                            text: "By",
+                            style: TextStyle(color: Colors.black45)),
+                        TextSpan(
+                            text: " ${PostsBLoC.currentPost.authorName}",
+                            style: TextStyle(color: Colors.black))
+                      ])),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: GestureDetector(
                     onTap: () async {
-                      launchTwitter(PostsBLoC.currentPost.sourceUrl);
+                      launchTwitter(PostsBLoC.currentPost.rawShareUrl);
                     },
                     child: Container(
                       child: Image.asset(
@@ -100,81 +155,165 @@ class PostPage extends StatelessWidget with PostPageStyle {
                       ),
                     ),
                   ),
-                  GestureDetector(
+                ),
+                Expanded(
+                  flex: 1,
+                  child: GestureDetector(
                     onTap: () async {
-                      launchFB(PostsBLoC.currentPost.sourceUrl);
+                      launchFB(PostsBLoC.currentPost.rawShareUrl);
                     },
                     child: Container(
                       child: Image.asset(
-                        "assets/Images/6e732beb65774ba42c65fadd8c6c623a.jpg",
+                        "assets/Images/6e732beb65774ba42c65fadd8c6c623a.png",
                         height: 50.h,
                         width: 50.h,
                       ),
                     ),
-                  )
-                ],
-              ),
-              SizedBox(
-                height: 20.h,
-              ),
-              SizedBox(
-                  height: 300.h,
-                  child: Image.network(
-                    PostsBLoC.currentPost.image,
-                    fit: BoxFit.fill,
-                  )),
-              SizedBox(
-                height: 10.h,
-              ),
-              Divider(
-                color: Colors.white,
-                thickness: 3.h,
-              ),
+                  ),
+                )
+              ],
+            ),
+            SizedBox(
+              height: 2.h,
+            ),
+            SizedBox(
+                height: 300.h,
+                child: Image.network(
+                  
+                  PostsBLoC.currentPost.image,
+                  
+                  fit: BoxFit.fill,
+                )),
+            SizedBox(
+              height: 10.h,
+            ),
+            Divider(
+              color: Colors.white,
+              thickness: 3.h,
+            ),
 
-              Html(
-                data: desc
-                    .replaceAll('<hr>', '')
-                    .replaceAll('[twitter_embed', '')
-                    .replaceAll('expand=1]', ''),
-                customRender: {
-                  "blockquote":
-                      (RenderContext context, Widget child, attributes, _) {
-                    return Container(
-                      height: height * 0.5,
-                      decoration: BoxDecoration(border: Border.all(width: 1)),
-                      child: SingleChildScrollView(
-                        child: TweetWebView.tweetID(
-                            attributes["data-twitter-tweet-id"]),
+            Html(
+              data: desc
+                  .replaceAll('<hr>', '')
+                  .replaceAll('[twitter_embed', '')
+                  .replaceAll('expand=1]', ''),
+              customRender: {
+                "blockquote":
+                    (RenderContext context, Widget child, attributes, _) {
+                     
+                  String tweetId = attributes["data-twitter-tweet-id"];
+                  print(tweetId);
+                  if (tweetId != null)
+                    return ConstrainedBox(
+                      constraints: BoxConstraints(minWidth: width),
+                      child: FutureBuilder<Map<String, dynamic>>(
+                          future: getTweetDataFromId(tweetId),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData)
+                              return EmbeddedTweetView.fromTweet(
+                                  Tweet.fromJson(snapshot.data));
+                            else
+                              return SizedBox();
+                          }),
+                    );
+                  else
+                    return ConstrainedBox(
+                      constraints: BoxConstraints(minWidth: width),
+                      child: Html(
+                        data:
+                         _.innerHtml,
+                          style: descriptionStyle,
+                        onLinkTap: (link) async {
+                          if (await canLaunch(link))
+                            await launch(link);
+                          else
+                            print("Error");
+                        },
                       ),
                     );
-                  },
                 },
-                style: descriptionStyle,
-                onLinkTap: (link) async {
-                  if (await canLaunch(link))
-                    await launch(link);
-                  else
-                    print("Error");
-                },
+              },
+              style: descriptionStyle,
+              onLinkTap: (link) async {
+                if (await canLaunch(link))
+                  await launch(link);
+                else
+                  print("Error");
+              },
+            ),
+            // Text(PostsBLoC.currentPost.description.replaceAll('<hr>', '')),
+            SizedBox(
+              height: 10.h,
+            ),
+            Divider(
+              color: Colors.black,
+              thickness: 3.h,
+            ),
+            SizedBox(
+              height: 10.h,
+            ),
+            SizedBox(
+              height: 150.h,
+              child: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Container(
+                  width: width,
+                  child: Column(
+                    children: <Widget>[
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            "Member",
+                            style: TextStyle(
+                                color: txtCol,
+                                fontWeight: FontWeight.bold,
+                                fontStyle: FontStyle.italic,
+                                fontSize: 21),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20, right: 20),
+                          child: Text(
+                            "Support Raw Story, Ad-Free, with"
+                            " access to all content and special features",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: txtCol),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                          child: Align(
+                        alignment: Alignment.center,
+                        child: Text("\$14.99 / month",
+                            style: TextStyle(
+                                color: txtCol,
+                                fontWeight: FontWeight.bold,
+                                fontStyle: FontStyle.italic,
+                                fontSize: 21)),
+                      ))
+                    ],
+                  ),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: contCol),
+                ),
               ),
-              // Text(PostsBLoC.currentPost.description
-              //     .replaceAll('<hr>', '')
-              //     .replaceAll('[twitter_embed', '')
-              //     .replaceAll('expand=1]', '')),
-              // SizedBox(
-              //   height: 10.h,
-              // ),
-              Divider(
-                color: Colors.black,
-                thickness: 3.h,
-              ),
-              SizedBox(
-                height: 10.h,
-              ),
-              SizedBox(
-                height: 150.h,
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
+            ),
+            SizedBox(
+              height: 150.h,
+              child: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Banner(
+                  textStyle: TextStyle(
+                      color: Colors.black,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold),
+                  color: Colors.grey,
+                  location: BannerLocation.topStart,
+                  message: "Save Over \$40%",
                   child: Container(
                     width: width,
                     child: Column(
@@ -182,132 +321,28 @@ class PostPage extends StatelessWidget with PostPageStyle {
                         Expanded(
                           child: Align(
                             alignment: Alignment.center,
-                            child: Text(
-                              "Member",
-                              style: TextStyle(
-                                  color: txtCol,
-                                  fontWeight: FontWeight.bold,
-                                  fontStyle: FontStyle.italic,
-                                  fontSize: 21),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 20, right: 20),
-                            child: Text(
-                              "Support Raw Story, Ad-Free, with"
-                              " access to all content and special features",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: txtCol),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                            child: Align(
-                          alignment: Alignment.center,
-                          child: Text("\$14.99 / month",
-                              style: TextStyle(
-                                  color: txtCol,
-                                  fontWeight: FontWeight.bold,
-                                  fontStyle: FontStyle.italic,
-                                  fontSize: 21)),
-                        ))
-                      ],
-                    ),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: contCol),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 150.h,
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Banner(
-                    textStyle: TextStyle(
-                        color: Colors.black,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold),
-                    color: Colors.grey,
-                    location: BannerLocation.topStart,
-                    message: "Save Over \$40%",
-                    child: Container(
-                      width: width,
-                      child: Column(
-                        children: <Widget>[
-                          Expanded(
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: Text("Annual",
-                                  style: TextStyle(
-                                      color: txtCol,
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FontStyle.italic,
-                                      fontSize: 21)),
-                            ),
-                          ),
-                          Expanded(
-                              child: Padding(
-                            padding: EdgeInsets.only(left: 20, right: 20),
-                            child: Text(
-                              "Support Raw Story, Ad-Free, with"
-                              " access to all content and special features for full year",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: txtCol),
-                            ),
-                          )),
-                          Expanded(
-                              child: Align(
-                            alignment: Alignment.center,
-                            child: Text("\$95 for the year",
+                            child: Text("Annual",
                                 style: TextStyle(
                                     color: txtCol,
                                     fontWeight: FontWeight.bold,
                                     fontStyle: FontStyle.italic,
                                     fontSize: 21)),
-                          ))
-                        ],
-                      ),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: contCol),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 150.h,
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Container(
-                    width: width,
-                    child: Column(
-                      children: <Widget>[
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 20, right: 20),
-                              child: Text("Supporter",
-                                  style: TextStyle(
-                                      color: txtCol,
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FontStyle.italic,
-                                      fontSize: 21)),
-                            ),
                           ),
                         ),
                         Expanded(
-                            child: Text("Support Raw Story and go Ad-Free",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(color: txtCol))),
+                            child: Padding(
+                          padding: EdgeInsets.only(left: 20, right: 20),
+                          child: Text(
+                            "Support Raw Story, Ad-Free, with"
+                            " access to all content and special features for full year",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: txtCol),
+                          ),
+                        )),
                         Expanded(
                             child: Align(
                           alignment: Alignment.center,
-                          child: Text("\$9.99 / month",
+                          child: Text("\$95 for the year",
                               style: TextStyle(
                                   color: txtCol,
                                   fontWeight: FontWeight.bold,
@@ -321,9 +356,54 @@ class PostPage extends StatelessWidget with PostPageStyle {
                         color: contCol),
                   ),
                 ),
-              )
-            ],
-          ),
+              ),
+            ),
+            SizedBox(
+              height: 150.h,
+              child: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Container(
+                  width: width,
+                  child: Column(
+                    children: <Widget>[
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.only(left: 20, right: 20),
+                            child: Text("Supporter",
+                                style: TextStyle(
+                                    color: txtCol,
+                                    fontWeight: FontWeight.bold,
+                                    fontStyle: FontStyle.italic,
+                                    fontSize: 21)),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                          child: Text("Support Raw Story and go Ad-Free",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: txtCol))),
+                      Expanded(
+                          child: Align(
+                        alignment: Alignment.center,
+                        child: Text("\$9.99 / month",
+                            style: TextStyle(
+                                color: txtCol,
+                                fontWeight: FontWeight.bold,
+                                fontStyle: FontStyle.italic,
+                                fontSize: 21)),
+                      ))
+                    ],
+                  ),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: contCol),
+                ),
+              ),
+            )
+          ],
         ),
       ),
     );
