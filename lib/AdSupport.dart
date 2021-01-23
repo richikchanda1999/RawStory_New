@@ -16,11 +16,9 @@ class AdSupport {
   }
 
   NativeAdmobController nativeAdController = NativeAdmobController();
-  
-  
-  NativeAdmob nativeAd;
-  BannerAd myBanner ;
 
+  NativeAdmob nativeAd;
+  // BannerAd myBanner;
 
   String getAppId() {
     if (Platform.isIOS) {
@@ -41,36 +39,39 @@ class AdSupport {
   }
 
   void dispose() async {
-    await myBanner?.dispose();
+    // await myBanner?.dispose();
     nativeAdController.dispose();
-    myBanner = null;
+    // myBanner = null;
     nativeAdController = null;
+    nativeAd = null;
   }
 
   void initialize(double height) {
-    myBanner = BannerAd(
-      adUnitId: BannerAd.testAdUnitId,
-      size: AdSize.banner,
-      targetingInfo: MobileAdTargetingInfo(
-        keywords: <String>['news'],
-        contentUrl: 'https://flutter.io',
-        childDirected: false,
-      ),
-      listener: (MobileAdEvent event) {
-        print("BannerAd event is $event");
-      },
-    );
+    // FirebaseAdMob.instance.initialize(appId: AdSupport().getAppId());
 
-    myBanner
-      ..load().then((loaded) async {
-        if (loaded) {
-          try {
-            myBanner.show(anchorOffset: height);
-          } catch (error) {
-            print(error);
-          }
-        }
-      });
+    // myBanner = BannerAd(
+    //   adUnitId: BannerAd.testAdUnitId,
+    //   size: AdSize.banner,
+    //   targetingInfo: MobileAdTargetingInfo(
+    //     keywords: <String>['news'],
+    //     contentUrl: 'https://flutter.io',
+    //     childDirected: false,
+    //   ),
+    //   listener: (MobileAdEvent event) {
+    //     print("BannerAd event is $event");
+    //   },
+    // );
+
+    // myBanner
+    //   ..load().then((loaded) async {
+    //     if (loaded) {
+    //       try {
+    //         myBanner..show(anchorOffset: height);
+    //       } catch (error) {
+    //         print(error);
+    //       }
+    //     }
+    //   });
 
     nativeAdController = NativeAdmobController();
     nativeAd = NativeAdmob(
@@ -84,6 +85,4 @@ class AdSupport {
           // Others ...
         ));
   }
-
-  
 }

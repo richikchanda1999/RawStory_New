@@ -3,8 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:raw_story_new/BLoC/Screens.dart';
 
 class SubsPage extends StatelessWidget {
-
-
   var txtCol = Colors.white;
   var contCol = Colors.red;
   @override
@@ -29,11 +27,11 @@ class SubsPage extends StatelessWidget {
                 Expanded(
                   flex: 9,
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 10, 10, 10),
+                    padding: const EdgeInsets.only(left: 8),
                     child: Text("Join Raw Story today",
                         style: TextStyle(
                             color: txtCol,
-                            fontSize: 20,
+                            fontSize: 19,
                             fontWeight: FontWeight.bold,
                             fontStyle: FontStyle.italic)),
                   ),
@@ -56,13 +54,13 @@ class SubsPage extends StatelessWidget {
           Expanded(
               flex: 3,
               child: Padding(
-                padding: const EdgeInsets.only(left: 20, right: 20),
+                padding: const EdgeInsets.only(left: 8, right: 8),
                 child: Text(
                   "Progressive journalism matters to you, and we know that ads get in the way,so become a member / supporter"
-                  " of RawStory to see clearer picture.\n\n\nWe believe facts are sacred. Become part of a movement with us."
+                  " of RawStory to see clearer picture.\n\nWe believe facts are sacred. Become part of a movement with us."
                   " Power progressive journalism.",
                   textAlign: TextAlign.justify,
-                  style: TextStyle(color: txtCol, fontSize: 15),
+                  style: TextStyle(color: txtCol, fontSize: 14),
                 ),
               )),
           Expanded(
@@ -128,12 +126,10 @@ class SubsPage extends StatelessWidget {
                 child: Banner(
                   location: BannerLocation.topStart,
                   textStyle: TextStyle(
-                    
                       color: Colors.black,
                       fontSize: 11,
                       fontWeight: FontWeight.bold),
                   color: Colors.grey,
-                  
                   message: "Save Over \$40%",
                   child: Container(
                     width: width,

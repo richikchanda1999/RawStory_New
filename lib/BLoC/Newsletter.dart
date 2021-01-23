@@ -13,7 +13,7 @@ class NewsletterBloc {
 
   String postUpEmail = "adeeb@rawstory.com";
   String postUpPass = "4wz!NK3qfWqy6Yn";
-  int listId = 450;
+  int listId = 1;
 
   Future<int> createRecipient(String emailId) async {
     String endPoint = "https://api.postup.com/api/recipient";
@@ -33,7 +33,7 @@ class NewsletterBloc {
     var resBody = json.decode(response.body);
     print(resBody);
     if (resBody.isNotEmpty) {
-      if (resBody["recipientId"]!=null)
+      if (resBody["recipientId"] != null)
         return resBody["recipientId"];
       else
         return -1;
@@ -59,7 +59,7 @@ class NewsletterBloc {
     var resBody = json.decode(response.body);
     print(resBody);
     if (resBody.isNotEmpty) {
-      if (resBody["recipientId"] !=null)
+      if (resBody["recipientId"] != null)
         return true;
       else
         return false;

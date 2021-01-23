@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:raw_story_new/BLoC/Screens.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:raw_story_new/Settings/NotificationPreference.dart';
 import 'package:raw_story_new/Styles/Settings.dart';
 import 'package:raw_story_new/Settings/ThemesProvider.dart';
+import 'package:raw_story_new/Settings/SizeProvider.dart';
+import 'package:workmanager/workmanager.dart';
 
 class Settings extends StatelessWidget {
- 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,16 +30,18 @@ class Settings extends StatelessWidget {
         centerTitle: true,
       ),
       resizeToAvoidBottomPadding: true,
-      bottomNavigationBar: SizedBox(height: 60,),
+      bottomNavigationBar: SizedBox(
+        height: 60,
+      ),
       body: ListView(
         padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 20.w),
         children: <Widget>[
-          ProfilePage(),
+          // ProfilePage(),
           mediumGap(),
           Notifications(),
           mediumGap(),
           ApplicationSettings(),
-          Newsletters(),
+          // Newsletters(),
         ],
       ),
     );
@@ -184,11 +188,11 @@ class Notifications extends StatelessWidget with SettingsStyle {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            MySwitch('Enable Notifications', true , false),
-            Text('What would you like to be notified about?'),
-            CheckBoxTile('Breaking News'),
-            CheckBoxTile('News Alerts'),
-            CheckBoxTile('Updates To Bookmarked Stories')
+            MySwitch('Enable Notifications', true, false),
+            // Text('What would you like to be notified about?'),
+            // CheckBoxTile('Breaking News'),
+            // CheckBoxTile('News Alerts'),
+            // CheckBoxTile('Updates To Bookmarked Stories')
           ],
         ),
       ),
@@ -236,8 +240,6 @@ class _CheckBoxTileState extends State<CheckBoxTile> with SettingsStyle {
 }
 
 class ApplicationSettings extends StatelessWidget with SettingsStyle {
-
-
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -252,7 +254,7 @@ class ApplicationSettings extends StatelessWidget with SettingsStyle {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            MySwitch('Enable Dark Mode', false,true),
+            MySwitch('Enable Dark Mode', false, true),
             Text('Text Size'),
             MySlider()
           ],
@@ -268,12 +270,13 @@ class MySlider extends StatefulWidget {
 }
 
 class _MySliderState extends State<MySlider> {
-  double value = 0.35;
-  double min = 0.0;
+  double value = 0.65;
+  double min = 0.5;
   double max = 1.0;
 
   @override
   Widget build(BuildContext context) {
+    final fontSizeProvider = context.watch<FontSizeProvider>();
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       child: Row(
@@ -285,14 +288,17 @@ class _MySliderState extends State<MySlider> {
             style: TextStyle(fontSize: 20.ssp),
           ),
           Expanded(
-            child: Slider(
-                value: value,
-                min: min,
-                max: max,
-                onChanged: (v) {
-                  setState(() {
-                    value = v;
-                  });
+            child: FutureBuilder<double>(
+                future: fontSizeProvider.getCurrentSize,
+                builder: (context, snapshot) {
+                  return Slider(
+                      value: snapshot.hasData ? snapshot.data : value,
+                      min: min,
+                      max: max,
+                      onChanged: (v) {
+                        fontSizeProvider.setSize(v);
+                        print(v);
+                      });
                 }),
           ),
           Text(
@@ -335,16 +341,18 @@ class MySwitch extends StatefulWidget {
   final String text;
   bool value;
   final bool isAppSettings;
-  MySwitch(this.text, this.value,this.isAppSettings);
+  MySwitch(this.text, this.value, this.isAppSettings);
 
   @override
   _MySwitchState createState() => _MySwitchState();
 }
 
-class _MySwitchState extends State<MySwitch> with SettingsStyle{
+class _MySwitchState extends State<MySwitch> with SettingsStyle {
+  final NotificationPreference notificationPreference =
+      NotificationPreference();
   @override
   Widget build(BuildContext context) {
-    final themeProvider=Provider.of<ThemeProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
@@ -353,36 +361,50 @@ class _MySwitchState extends State<MySwitch> with SettingsStyle{
           style: subheadingStyle,
         ),
         Spacer(),
-        widget.isAppSettings?
-        FutureBuilder<bool>(
-          future: themeProvider.getCurrentTheme,
-          builder: (context, snapshot) {
-            return Switch(
-              value: snapshot.hasData?snapshot.data:false,
-              onChanged: (v) {
-                
-                  themeProvider.setTheme(v);
-                
-                // setState(() {
-                //   widget.value =v;
-                // });
-              },
-              activeColor: Colors.blueAccent,
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            );
-          }
-        ):Switch(
-          value: widget.value,
-          onChanged: (v) {
-          
-            
-            setState(() {
-              widget.value =v;
-            });
-          },
-          activeColor: Colors.blueAccent,
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        )
+        widget.isAppSettings
+            ? FutureBuilder<bool>(
+                future: themeProvider.getCurrentTheme,
+                builder: (context, snapshot) {
+                  return Switch(
+                    value: snapshot.hasData ? snapshot.data : false,
+                    onChanged: (v) {
+                      themeProvider.setTheme(v);
+
+                      // setState(() {
+                      //   widget.value =v;
+                      // });
+                    },
+                    activeColor: Colors.blueAccent,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  );
+                })
+            : FutureBuilder<bool>(
+                future: notificationPreference.getPreference(),
+                builder: (context, snapshot) {
+                  return Switch(
+                    value: snapshot.hasData ? snapshot.data : true,
+                    onChanged: (v) {
+                      notificationPreference.setPreference(v);
+
+                      setState(() {
+                        print("Notification : ${snapshot.data}");
+                        if (!v) {
+                          print("cancel");
+                          Workmanager.cancelByUniqueName("RawStoryTask");
+                        } else {
+                          print("register");
+                          Workmanager.registerPeriodicTask(
+                              "RawStoryTask", "RawStoryBackgroundTask",
+                              frequency: Duration(minutes: 15),
+                              constraints: Constraints(
+                                  networkType: NetworkType.connected));
+                        }
+                      });
+                    },
+                    activeColor: Colors.blueAccent,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  );
+                })
       ],
     );
   }

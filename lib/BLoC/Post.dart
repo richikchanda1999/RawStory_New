@@ -8,9 +8,12 @@ class PostsBLoC {
   PostsBLoC._internal();
 
   BehaviorSubject<List<Post>> postController;
+
   Function(List<Post>) get addPosts => postController.sink.add;
+
   Stream<List<Post>> get getPosts => postController.stream;
 
+  List<Post> currentPosts = List<Post>();
   static Post currentPost;
   List<String> currentSection;
   String currentSectionText;
@@ -19,16 +22,40 @@ class PostsBLoC {
     postController = BehaviorSubject();
   }
 
-  Future<void> fetchPosts(int limit, int offset, List<String> sections,{String currentSectionText}) async {
-    List<Post> posts = List();
-    currentSection=sections;
-    this.currentSectionText=currentSectionText;
+  double scrollOffset = 0.0;
+  int postCount = 20;
+  void setOffset(double offset) {
+    scrollOffset = offset;
+  }
+
+  void setPostCount(int c) {
+    postCount = c;
+  }
+
+  Future<void> fetchPosts(int limit, int offset, List<String> sections,
+      {String currentSectionText}) async {
+    setOffset(0.0);
+    setPostCount(20);
+    currentPosts = List<Post>();
+    currentSection = sections;
+    this.currentSectionText = currentSectionText;
     for (String sectionName in sections) {
       List<Post> temp = await Worker.work(
           limit: limit, offset: offset, sectionName: sectionName);
-      posts.addAll(temp);
+      currentPosts.addAll(temp);
     }
-    addPosts(posts);
+    addPosts(currentPosts);
+  }
+
+  Future<void> fetchExtraPost(
+      int limit, int offset, List<String> sections) async {
+    for (String sectionName in sections) {
+      List<Post> temp = await Worker.work(
+          limit: limit, offset: offset, sectionName: sectionName);
+      currentPosts.addAll(temp);
+    }
+
+    addPosts(currentPosts);
   }
 
   void dispose() {

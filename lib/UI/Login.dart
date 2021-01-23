@@ -43,7 +43,6 @@ class _LoginPageState extends State<LoginPage> {
               child: CircularProgressIndicator(),
             )
           : Builder(builder: (context) {
-              print(callbackUrl);
               return WebView(
                 javascriptMode: JavascriptMode.unrestricted,
                 initialUrl: AuthBLoC().callbackURL,
@@ -51,7 +50,10 @@ class _LoginPageState extends State<LoginPage> {
                   AuthBLoC().webViewController = _;
                 },
                 onPageStarted: (_) {
-                  print(_);
+                  print("urlStart : $_");
+                },
+                onPageFinished: (_) {
+                  print("urlFinish : $_");
                 },
               );
             }),

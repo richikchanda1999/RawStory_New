@@ -11,7 +11,7 @@ class Post {
     id = map['id'];
     headline = map['headline'];
     description = map['description'];
-    image = map['image'];
+    image = map['image'] ?? null;
     insertedDate = map['inserted_date'];
     insertedTS = map['inserted_ts'];
     updatedTS = map['updated_ts'];

@@ -8,7 +8,7 @@ import 'package:raw_story_new/Models/Post.dart';
 var username = 'raw';
 var password = 'story';
 String key = "Gl7Zt29tYHGHhqGDuRV01NK8pq5UCDdht2EFwOfIGeDqv2oG80TXH006IAhG43z6";
-var params = {'Content-Type': 'application/json', 'X-RMAuth': key};
+// var params = {'Content-Type': 'application/json', 'X-RMAuth': key};
 
 class Worker {
   static final Worker _worker = Worker._internal();
@@ -49,9 +49,10 @@ class Worker {
   static Future<List<Post>> getPosts(
       {int limit, int offset, String sectionName}) async {
     String url =
-        "https://$username:$password@rawstory.com/api/1.3/posts/section?section_name=$sectionName&limit=$limit&offset=$offset";
+        "https://$username:$password@www.rawstory.com/api/1.3/posts/section"
+        "?section_name=$sectionName&limit=$limit&offset=$offset&api_key=$key";
     print(url);
-    var req = await http.get(url, headers: params);
+    var req = await http.get(url);
     print(req.statusCode);
     List<Post> posts = List();
     if (req.statusCode == 200) {
@@ -77,7 +78,7 @@ class Worker {
   static void postsReceived(dynamic message) {
     if (message is List<List<dynamic>>) {
       posts = message.map((e) => Post.fromList(e)).toList();
-      posts.shuffle();
+
       _isIsolateComplete.complete(true);
     }
 

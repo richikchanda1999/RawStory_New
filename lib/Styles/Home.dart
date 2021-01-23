@@ -6,7 +6,8 @@ mixin HomeStyle {
 }
 
 mixin PostCardStyle {
-  TextStyle get postHeadlineStyle1 => TextStyle(color: Colors.white, fontSize: 42.ssp,fontFamily: 'Oswald');
-  TextStyle get postHeadlineStyle2 => TextStyle( fontSize: 34.ssp,fontFamily: 'Oswald');
+  TextStyle get postHeadlineStyle1 =>
+      TextStyle(color: Colors.white, fontSize: 40.ssp, fontFamily: 'Oswald');
+  TextStyle get postHeadlineStyle2 =>
+      TextStyle(fontSize: 32.ssp, fontFamily: 'Oswald');
 }
-

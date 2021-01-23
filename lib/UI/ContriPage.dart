@@ -1,15 +1,10 @@
-import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:raw_story_new/AdSupport.dart';
-import 'package:raw_story_new/BLoC/Screens.dart';
 
 class ContributionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     return Container(
-      color: Colors.white,
       child: Column(
         children: <Widget>[
           Expanded(
@@ -23,7 +18,7 @@ class ContributionPage extends StatelessWidget {
                 ),
               )),
           Expanded(
-              flex:9,
+              flex: 9,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
@@ -67,7 +62,8 @@ class ContributionPage extends StatelessWidget {
           Expanded(
               flex: 2,
               child: Padding(
-                padding: const EdgeInsets.only(top: 20,bottom: 20,left: 8,right: 8),
+                padding: const EdgeInsets.only(
+                    top: 20, bottom: 20, left: 8, right: 8),
                 child: Row(
                   children: <Widget>[
                     Expanded(
@@ -111,7 +107,6 @@ class ContributionPage extends StatelessWidget {
             "Click here to contribute by check",
             style: TextStyle(color: Colors.red),
           )),
-
         ],
       ),
     );
